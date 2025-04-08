@@ -12,30 +12,27 @@
             padding: 0;
         }
 
-        header img {
+        header img, footer img {
             width: 100%;
             display: block;
         }
 
         .texto-superior {
-            text-align: right;
-            font-size: 18px;
+            text-align: left;
+            font-size: 16px;
             font-weight: bold;
-            padding: 10px 20px 0 20px;
+            padding: 15px 20px 5px 20px;
             color: #222;
         }
 
         .estado {
             text-align: center;
-            font-size: 22px;
+            font-size: 18px;
             font-weight: bold;
-            margin-top: 30px;
-            padding: 10px;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
+            margin: 20px auto 10px auto;
+            padding: 8px;
+            border-radius: 8px;
+            width: 85%;
             color: white;
         }
 
@@ -53,17 +50,21 @@
 
         .certificado {
             border: 2px solid #ccc;
-            padding: 20px;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 600px;
-            margin: 30px auto;
+            padding: 15px 20px;
+            border-radius: 10px;
+            width: 85%;
+            margin: 20px auto;
             background-color: #f2f2f2;
+            font-size: 15px;
         }
 
         .dato {
-            margin: 8px 0;
-            font-size: 16px;
+            margin: 10px 0;
+        }
+
+        .dato strong {
+            display: block;
+            font-weight: bold;
         }
 
         .valido {
@@ -75,38 +76,31 @@
 
         .btn-regresar {
             display: block;
-            width: 90%;
-            max-width: 600px;
-            margin: 30px auto;
+            width: 85%;
+            margin: 20px auto 30px auto;
             text-align: center;
         }
 
         .btn-regresar a {
-            background-color: #6a0dad;
+            background-color: #5a5eaa;
             color: white;
             text-decoration: none;
-            padding: 12px 20px;
+            padding: 10px 18px;
             border-radius: 8px;
-            font-size: 16px;
+            font-size: 15px;
             display: inline-block;
         }
 
         .btn-regresar a:hover {
-            background-color: #570091;
-        }
-
-        footer img {
-            width: 100%;
-            display: block;
-            margin-top: 40px;
+            background-color: #4c4f95;
         }
 
         @media (max-width: 600px) {
             .texto-superior {
-                font-size: 16px;
+                font-size: 15px;
             }
             .estado {
-                font-size: 20px;
+                font-size: 16px;
             }
         }
     </style>
@@ -135,13 +129,13 @@
 
     {% if resultado.estado != "No encontrado" %}
     <div class="certificado">
-        <div class="dato"><strong>Fecha de Expedición:</strong> {{ resultado.fecha_expedicion }}</div>
-        <div class="dato"><strong>Fecha de Vencimiento:</strong> {{ resultado.fecha_vencimiento }}</div>
-        <div class="dato"><strong>Marca:</strong> {{ resultado.marca }}</div>
-        <div class="dato"><strong>Línea:</strong> {{ resultado.linea }}</div>
-        <div class="dato"><strong>Año:</strong> {{ resultado.año }}</div>
-        <div class="dato"><strong>Número de Serie:</strong> {{ resultado.numero_serie }}</div>
-        <div class="dato"><strong>Número de Motor:</strong> {{ resultado.numero_motor }}</div>
+        <div class="dato"><strong>Fecha de Expedición:</strong>{{ resultado.fecha_expedicion }}</div>
+        <div class="dato"><strong>Fecha de Vencimiento:</strong>{{ resultado.fecha_vencimiento }}</div>
+        <div class="dato"><strong>Marca:</strong>{{ resultado.marca }}</div>
+        <div class="dato"><strong>Línea:</strong>{{ resultado.linea }}</div>
+        <div class="dato"><strong>Año:</strong>{{ resultado.año }}</div>
+        <div class="dato"><strong>Número de Serie:</strong>{{ resultado.numero_serie }}</div>
+        <div class="dato"><strong>Número de Motor:</strong>{{ resultado.numero_motor }}</div>
     </div>
     {% endif %}
 
