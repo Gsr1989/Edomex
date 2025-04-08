@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel de Administración</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            background-color: #ffffff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 30px;
+        }
+        header img {
+            height: 80px;
+        }
+        .titulo {
+            text-align: center;
+            font-size: 28px;
+            margin-top: 30px;
+            font-weight: bold;
+            color: #222;
+        }
+        .botones {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px auto;
+            flex-wrap: wrap;
+            max-width: 600px;
+        }
+        .btn {
+            background-color: #800000;
+            color: white;
+            border: none;
+            padding: 14px 22px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #a00000;
+        }
+        footer {
+            margin-top: 40px;
+            width: 100%;
+        }
+        footer img {
+            width: 100%;
+            display: block;
+        }
+        @media (max-width: 600px) {
+            header img {
+                height: 60px;
+            }
+            .titulo {
+                font-size: 24px;
+                margin-top: 20px;
+            }
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+        <img src="{{ url_for('static', filename='sub_logo.png') }}" alt="Sub Logo">
+    </header>
+
+    <div class="titulo">Secretaría de Movilidad</div>
+
+    <div class="botones">
+        <a href="{{ url_for('registro_admin') }}"><button class="btn">Registrar Folio</button></a>
+        <a href="{{ url_for('consulta_folio') }}"><button class="btn">Consultar Folio</button></a>
+        <a href="{{ url_for('crear_usuario') }}"><button class="btn">Crear Usuario</button></a>
+        <a href="{{ url_for('logout') }}"><button class="btn">Cerrar Sesión</button></a>
+    </div>
+
+    <footer>
+        <img src="{{ url_for('static', filename='footer.png') }}" alt="Footer">
+    </footer>
+
+</body>
+            </html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro de Folio (Admin)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            background-color: #ffffff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 30px;
+        }
+        header img {
+            height: 80px;
+        }
+        .titulo {
+            text-align: center;
+            font-size: 28px;
+            margin-top: 30px;
+            font-weight: bold;
+            color: #222;
+        }
+        .formulario {
+            max-width: 600px;
+            margin: 30px auto;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+        .btn {
+            background-color: #800000;
+            color: white;
+            border: none;
+            padding: 14px 22px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            margin-top: 15px;
+        }
+        .btn:hover {
+            background-color: #a00000;
+        }
+        footer {
+            margin-top: 40px;
+            width: 100%;
+        }
+        footer img {
+            width: 100%;
+            display: block;
+        }
+        .flash-message {
+            padding: 10px;
+            margin: 15px auto;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+        }
+        .success {
+            background-color: green;
+        }
+        .error {
+            background-color: red;
+        }
+        @media (max-width: 600px) {
+            header img {
+                height: 60px;
+            }
+            .titulo {
+                font-size: 24px;
+                margin-top: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+        <img src="{{ url_for('static', filename='sub_logo.png') }}" alt="Sub Logo">
+    </header>
+
+    <div class="titulo">Secretaría de Movilidad</div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-message {{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" class="formulario">
+        <input type="text" name="folio" placeholder="Folio" required>
+        <input type="text" name="marca" placeholder="Marca" required>
+        <input type="text" name="linea" placeholder="Línea" required>
+        <input type="number" name="anio" placeholder="Año" required>
+        <input type="text" name="serie" placeholder="Número de Serie" required>
+        <input type="text" name="motor" placeholder="Número de Motor" required>
+
+        <select name="vigencia" required>
+            <option value="">Selecciona vigencia</option>
+            <option value="30">30 días</option>
+            <option value="60">60 días</option>
+            <option value="90">90 días</option>
+        </select>
+
+        <button type="submit" class="btn">Registrar Folio</button>
+
+        <div style="margin-top: 30px; display: flex; flex-direction: column; gap: 10px;">
+            <a href="{{ url_for('admin') }}">
+                <button type="button" class="btn">Volver al Panel</button>
+            </a>
+            <a href="{{ url_for('consulta_folio') }}">
+                <button type="button" class="btn">Consultar Folio</button>
+            </a>
+            <a href="{{ url_for('logout') }}">
+                <button type="button" class="btn">Cerrar Sesión</button>
+            </a>
+        </div>
+    </form>
+
+    <footer>
+        <img src="{{ url_for('static', filename='footer.png') }}" alt="Footer">
+    </footer>
+
+</body>
+    </html>
