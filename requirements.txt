@@ -1,0 +1,5 @@
+Flask==2.3.3
+gunicorn==21.2.0
+reportlab==4.0.5
+supabase==1.0.3
+python-dotenv==1.0.1
