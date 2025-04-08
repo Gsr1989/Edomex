@@ -12,30 +12,17 @@
             padding: 0;
         }
 
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 30px;
-        }
-
         header img {
-            height: 80px;
+            width: 100%;
+            display: block;
         }
 
-        .titulo {
-            text-align: center;
-            font-size: 24px;
-            margin-top: 20px;
-            font-weight: bold;
-            color: #222;
-        }
-
-        .subtitulo {
-            text-align: center;
+        .texto-superior {
+            text-align: right;
             font-size: 18px;
-            margin-top: 5px;
-            color: #444;
+            font-weight: bold;
+            padding: 10px 20px 0 20px;
+            color: #222;
         }
 
         .estado {
@@ -95,7 +82,7 @@
         }
 
         .btn-regresar a {
-            background-color: #800000;
+            background-color: #6a0dad;
             color: white;
             text-decoration: none;
             padding: 12px 20px;
@@ -105,25 +92,18 @@
         }
 
         .btn-regresar a:hover {
-            background-color: #a00000;
-        }
-
-        footer {
-            margin-top: 40px;
-            width: 100%;
+            background-color: #570091;
         }
 
         footer img {
             width: 100%;
             display: block;
+            margin-top: 40px;
         }
 
         @media (max-width: 600px) {
-            header img {
-                height: 60px;
-            }
-            .titulo {
-                font-size: 20px;
+            .texto-superior {
+                font-size: 16px;
             }
             .estado {
                 font-size: 20px;
@@ -134,12 +114,10 @@
 <body>
 
     <header>
-        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
-        <img src="{{ url_for('static', filename='sub_logo.png') }}" alt="Sub Logo">
+        <img src="{{ url_for('static', filename='cabeza.jpg') }}" alt="Encabezado">
     </header>
 
-    <div class="titulo">Secretaría de Movilidad</div>
-    <div class="subtitulo">Ciudad de México</div>
+    <div class="texto-superior">RESULTADO DE CONSULTA:</div>
 
     {% if resultado.estado == "No encontrado" %}
         <div class="estado no-encontrado">
@@ -170,11 +148,11 @@
     <div class="valido">DOCUMENTO DIGITAL VÁLIDO EN TODO MÉXICO</div>
 
     <div class="btn-regresar">
-        <a href="{{ url_for('consulta_folio') }}">Regresar</a>
+        <a href="{{ url_for('consulta_folio') }}">Consultar Otro</a>
     </div>
 
     <footer>
-        <img src="{{ url_for('static', filename='footer.png') }}" alt="Footer">
+        <img src="{{ url_for('static', filename='pies.jpg') }}" alt="Pie de página">
     </footer>
 
 </body>
