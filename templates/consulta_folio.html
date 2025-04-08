@@ -34,27 +34,13 @@
             font-size: 16px;
         }
 
-        .input-con-icono {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .input-con-icono input[type="text"] {
+        .campo input[type="text"] {
             width: 100%;
             padding: 12px;
             border-radius: 10px;
             border: 1px solid #ccc;
             background-color: #f8f8f8;
             box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
-            padding-right: 40px;
-        }
-
-        .icono-ayuda {
-            position: absolute;
-            right: 10px;
-            height: 20px;
-            cursor: pointer;
         }
 
         button {
@@ -93,10 +79,7 @@
         <form action="/consulta_folio" method="POST">
             <div class="campo">
                 <label for="folio">No. De Folio del Permiso: *</label>
-                <div class="input-con-icono">
-                    <input type="text" id="folio" name="folio" placeholder="Ingresa tu folio" required>
-                    <img src="{{ url_for('static', filename='ayuda.png') }}" alt="Ayuda" class="icono-ayuda" title="Ingresa el número de folio de tu documento">
-                </div>
+                <input type="text" id="folio" name="folio" placeholder="Ingresa tu folio" required>
             </div>
             <button type="submit">Consultar</button>
         </form>
