@@ -11,22 +11,20 @@
             margin: 0;
             padding: 0;
         }
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 30px;
-        }
+
         header img {
-            height: 80px;
+            width: 100%;
+            display: block;
         }
+
         .titulo {
             text-align: center;
             font-size: 28px;
-            margin-top: 30px;
+            margin: 30px 0 10px;
             font-weight: bold;
             color: #222;
         }
+
         .formulario {
             max-width: 600px;
             margin: 30px auto;
@@ -34,6 +32,7 @@
             border-radius: 10px;
             background-color: #f9f9f9;
         }
+
         input {
             width: 100%;
             padding: 12px;
@@ -42,8 +41,9 @@
             border: 1px solid #ccc;
             font-size: 16px;
         }
+
         .btn, .nav-btn {
-            background-color: #800000;
+            background-color: #5a5eaa;
             color: white;
             border: none;
             padding: 14px 22px;
@@ -56,10 +56,13 @@
             text-align: center;
             display: block;
             text-decoration: none;
+            font-weight: bold;
         }
+
         .btn:hover, .nav-btn:hover {
-            background-color: #a00000;
+            background-color: #4c4f95;
         }
+
         .mensaje {
             margin: 20px auto;
             max-width: 600px;
@@ -68,26 +71,28 @@
             font-weight: bold;
             border-radius: 5px;
         }
+
         .success {
             background-color: #4CAF50;
             color: white;
         }
+
         .error {
             background-color: #f44336;
             color: white;
         }
+
         footer {
             margin-top: 40px;
             width: 100%;
         }
+
         footer img {
             width: 100%;
             display: block;
         }
+
         @media (max-width: 600px) {
-            header img {
-                height: 60px;
-            }
             .titulo {
                 font-size: 24px;
                 margin-top: 20px;
@@ -98,11 +103,10 @@
 <body>
 
 <header>
-    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
-    <img src="{{ url_for('static', filename='sub_logo.png') }}" alt="Sub Logo">
+    <img src="{{ url_for('static', filename='foliox.jpg') }}" alt="Encabezado">
 </header>
 
-<div class="titulo">Secretaría de Movilidad</div>
+<div class="titulo">Crear Usuario</div>
 
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
@@ -126,7 +130,7 @@
 </div>
 
 <footer>
-    <img src="{{ url_for('static', filename='footer.png') }}" alt="Footer">
+    <img src="{{ url_for('static', filename='pies.jpg') }}" alt="Pie de página">
 </footer>
 
 </body>
