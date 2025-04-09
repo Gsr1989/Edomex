@@ -11,27 +11,26 @@
             margin: 0;
             padding: 0;
         }
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 30px;
-        }
+
         header img {
-            height: 80px;
+            width: 100%;
+            display: block;
         }
+
         .titulo {
             text-align: center;
             font-size: 28px;
-            margin-top: 20px;
+            margin: 30px 0 10px;
             font-weight: bold;
             color: #222;
         }
+
         .info-folios {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 10px;
             font-size: 18px;
         }
+
         .formulario {
             max-width: 600px;
             margin: 30px auto;
@@ -39,6 +38,7 @@
             border-radius: 10px;
             background-color: #f9f9f9;
         }
+
         input, select {
             width: 100%;
             padding: 12px;
@@ -47,8 +47,9 @@
             border: 1px solid #ccc;
             font-size: 16px;
         }
+
         .btn {
-            background-color: #800000;
+            background-color: #5a5eaa;
             color: white;
             border: none;
             padding: 14px 22px;
@@ -58,10 +59,13 @@
             transition: background-color 0.3s ease;
             width: 100%;
             margin-top: 15px;
+            font-weight: bold;
         }
+
         .btn:hover {
-            background-color: #a00000;
+            background-color: #4c4f95;
         }
+
         .mensaje {
             margin: 20px auto;
             max-width: 600px;
@@ -70,22 +74,26 @@
             font-weight: bold;
             border-radius: 5px;
         }
+
         .success {
             background-color: #4CAF50;
             color: white;
         }
+
         .error {
             background-color: #f44336;
             color: white;
         }
+
         .botones-acciones {
             display: flex;
             justify-content: center;
             gap: 10px;
             margin-top: 20px;
         }
+
         .botones-acciones a {
-            background-color: #800000;
+            background-color: #5a5eaa;
             color: white;
             padding: 10px 18px;
             border-radius: 6px;
@@ -93,21 +101,22 @@
             font-size: 15px;
             transition: background-color 0.3s ease;
         }
+
         .botones-acciones a:hover {
-            background-color: #a00000;
+            background-color: #4c4f95;
         }
+
         footer {
             margin-top: 40px;
             width: 100%;
         }
+
         footer img {
             width: 100%;
             display: block;
         }
+
         @media (max-width: 600px) {
-            header img {
-                height: 60px;
-            }
             .titulo {
                 font-size: 24px;
                 margin-top: 20px;
@@ -118,11 +127,10 @@
 <body>
 
 <header>
-    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
-    <img src="{{ url_for('static', filename='sub_logo.png') }}" alt="Sub Logo">
+    <img src="{{ url_for('static', filename='foliox.jpg') }}" alt="Encabezado">
 </header>
 
-<div class="titulo">Secretaría de Movilidad</div>
+<div class="titulo">Registro de Folio</div>
 
 <div class="info-folios">
     <p>Folios asignados: <strong>{{ folios_info.folios_asignac }}</strong></p>
@@ -162,7 +170,7 @@
 </div>
 
 <footer>
-    <img src="{{ url_for('static', filename='footer.png') }}" alt="Footer">
+    <img src="{{ url_for('static', filename='pies.jpg') }}" alt="Pie de página">
 </footer>
 
 </body>
