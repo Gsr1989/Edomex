@@ -12,21 +12,19 @@
             padding: 0;
             color: #000000;
         }
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 30px;
-        }
+
         header img {
-            height: 80px;
+            width: 100%;
+            display: block;
         }
+
         .titulo {
             text-align: center;
             font-weight: bold;
-            font-size: 24px;
+            font-size: 28px;
             margin: 30px 0 20px;
         }
+
         form {
             max-width: 600px;
             margin: auto;
@@ -34,6 +32,7 @@
             background-color: #f9f9f9;
             border-radius: 10px;
         }
+
         input, select {
             width: 100%;
             padding: 12px;
@@ -42,8 +41,9 @@
             border: 1px solid #ccc;
             font-size: 16px;
         }
+
         .btn {
-            background-color: #800000;
+            background-color: #5a5eaa;
             color: white;
             border: none;
             padding: 12px;
@@ -51,29 +51,32 @@
             border-radius: 8px;
             cursor: pointer;
             width: 100%;
+            font-weight: bold;
         }
+
         .btn:hover {
-            background-color: #a00000;
+            background-color: #4c4f95;
         }
+
         .mensaje {
             text-align: center;
             margin-bottom: 15px;
             font-weight: bold;
         }
+
         footer {
             margin-top: 40px;
             width: 100%;
         }
+
         footer img {
             width: 100%;
             display: block;
         }
+
         @media (max-width: 600px) {
-            header img {
-                height: 60px;
-            }
             .titulo {
-                font-size: 22px;
+                font-size: 24px;
                 margin-top: 20px;
             }
         }
@@ -82,11 +85,10 @@
 <body>
 
 <header>
-    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
-    <img src="{{ url_for('static', filename='sub_logo.png') }}" alt="Sublogo">
+    <img src="{{ url_for('static', filename='foliox.jpg') }}" alt="Encabezado">
 </header>
 
-<div class="titulo">Secretaría de Movilidad - Registro de Folio</div>
+<div class="titulo">Registro de Folio</div>
 
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
@@ -118,7 +120,7 @@
 </form>
 
 <footer>
-    <img src="{{ url_for('static', filename='footer.png') }}" alt="Footer">
+    <img src="{{ url_for('static', filename='pies.jpg') }}" alt="Pie de página">
 </footer>
 
 </body>
