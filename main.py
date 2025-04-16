@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from datetime import datetime, timedelta
 from supabase import create_client, Client
+import fitz    # <<--- PyMuPDF para manipular PDFs
+import os      # <<--- Para crear carpetas y guardar archivos
 
 app = Flask(__name__)
 app.secret_key = 'clave_muy_segura_123456'
@@ -21,10 +23,12 @@ def login():
         username = request.form['username']
         password = request.form['password']
 
+        # Autenticación de administrador (hardcodeada)
         if username == 'Gsr89roja.' and password == 'serg890105':
             session['admin'] = True
             return redirect(url_for('admin'))
 
+        # Autenticación de usuarios en Supabase
         response = supabase.table("verificaciondigitalcdmx").select("*").eq("username", username).eq("password", password).execute()
         usuarios = response.data
 
@@ -88,22 +92,25 @@ def registro_usuario():
         numero_motor = request.form['motor']
         vigencia = int(request.form['vigencia'])
 
+        # Verificar si existe el folio
         existente = supabase.table("folios_registrados").select("*").eq("folio", folio).execute()
         if existente.data:
             flash('Error: el folio ya existe.', 'error')
             return redirect(url_for('registro_usuario'))
 
+        # Verificar folios restantes del usuario
         usuario_data = supabase.table("verificaciondigitalcdmx").select("folios_asignac, folios_usados").eq("id", user_id).execute()
         if not usuario_data.data:
             flash("No se pudo obtener la información del usuario.", "error")
             return redirect(url_for('registro_usuario'))
 
-        folios = usuario_data.data[0]
-        restantes = folios['folios_asignac'] - folios['folios_usados']
+        folios_info = usuario_data.data[0]
+        restantes = folios_info['folios_asignac'] - folios_info['folios_usados']
         if restantes <= 0:
             flash("No tienes folios disponibles para registrar.", "error")
             return redirect(url_for('registro_usuario'))
 
+        # Calcular fechas
         fecha_expedicion = datetime.now()
         fecha_vencimiento = fecha_expedicion + timedelta(days=vigencia)
 
@@ -118,10 +125,13 @@ def registro_usuario():
             "fecha_vencimiento": fecha_vencimiento.isoformat()
         }
 
+        # Insertar registro
         supabase.table("folios_registrados").insert(data).execute()
+        # Actualizar folios usados
         supabase.table("verificaciondigitalcdmx").update({
-            "folios_usados": folios["folios_usados"] + 1
+            "folios_usados": folios_info["folios_usados"] + 1
         }).eq("id", user_id).execute()
+
         flash("Folio registrado correctamente.", "success")
         return redirect(url_for('registro_usuario'))
 
@@ -144,11 +154,13 @@ def registro_admin():
         numero_motor = request.form['motor']
         vigencia = int(request.form['vigencia'])
 
+        # Verificar si existe el folio
         existente = supabase.table("folios_registrados").select("*").eq("folio", folio).execute()
         if existente.data:
             flash('Error: el folio ya existe.', 'error')
             return render_template('registro_admin.html')
 
+        # Calcular fechas
         fecha_expedicion = datetime.now()
         fecha_vencimiento = fecha_expedicion + timedelta(days=vigencia)
 
@@ -163,8 +175,43 @@ def registro_admin():
             "fecha_vencimiento": fecha_vencimiento.isoformat()
         }
 
+        # Insertar en la base de datos
         supabase.table("folios_registrados").insert(data).execute()
+
+        # ============= AQUÍ GENERAMOS EL PDF =============
+        # Utilizamos PyMuPDF (fitz) y la plantilla "labuena3.0.pdf"
+        doc = fitz.open("labuena3.0.pdf")
+        page = doc[0]
+
+        # Insertamos 4 fechas en coordenadas distintas, con su fuente respectiva
+        # 1) Primera fecha
+        page.insert_text((166, 178), fecha_expedicion.strftime("%d/%m/%Y"), 
+                         fontsize=19, fontname="helv", color=(0, 0, 0))
+        # 2) Segunda fecha
+        page.insert_text((346, 178), fecha_expedicion.strftime("%d/%m/%Y"), 
+                         fontsize=19, fontname="helv", color=(0, 0, 0))
+        # 3) Tercera fecha
+        page.insert_text((296, 383), fecha_expedicion.strftime("%d/%m/%Y"), 
+                         fontsize=12, fontname="helv", color=(0, 0, 0))
+        # 4) Cuarta fecha
+        page.insert_text((225, 590), fecha_expedicion.strftime("%d/%m/%Y"), 
+                         fontsize=26, fontname="helv", color=(0, 0, 0))
+
+        # Insertamos el número de serie en la coordenada fijada
+        page.insert_text((256, 245), numero_serie, 
+                         fontsize=12, fontname="helv", color=(0, 0, 0))
+
+        # Crear carpeta documentos si no existe
+        if not os.path.exists("documentos"):
+            os.makedirs("documentos")
+
+        # Guardar el PDF final
+        doc.save(f"documentos/{folio}.pdf")
+        doc.close()
+        # ============= FIN GENERACIÓN PDF =============
+
         flash('Folio registrado correctamente.', 'success')
+        return render_template('registro_admin.html')
 
     return render_template('registro_admin.html')
 
