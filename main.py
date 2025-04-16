@@ -1,8 +1,8 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, flash, session, send_file
 from datetime import datetime, timedelta
 from supabase import create_client, Client
-import fitz    # <<--- PyMuPDF para manipular PDFs
-import os      # <<--- Para crear carpetas y guardar archivos
+import fitz    # PyMuPDF para manipular PDFs
+import os      # Para crear carpetas y guardar archivos
 
 app = Flask(__name__)
 app.secret_key = 'clave_muy_segura_123456'
@@ -11,11 +11,9 @@ SUPABASE_URL = "https://xsagwqepoljfsogusubw.supabase.co"
 SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhzYWd3cWVwb2xqZnNvZ3VzdWJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM5NjM3NTUsImV4cCI6MjA1OTUzOTc1NX0.NUixULn0m2o49At8j6X58UqbXre2O2_JStqzls_8Gws"
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-
 @app.route('/')
 def inicio():
     return redirect(url_for('login'))
-
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -41,13 +39,11 @@ def login():
 
     return render_template('login.html')
 
-
 @app.route('/admin')
 def admin():
     if 'admin' not in session:
         return redirect(url_for('login'))
     return render_template('panel.html')
-
 
 @app.route('/crear_usuario', methods=['GET', 'POST'])
 def crear_usuario():
@@ -74,7 +70,6 @@ def crear_usuario():
         flash('Usuario creado exitosamente.', 'success')
 
     return render_template('crear_usuario.html')
-
 
 @app.route('/registro_usuario', methods=['GET', 'POST'])
 def registro_usuario():
@@ -139,7 +134,6 @@ def registro_usuario():
     folios_info = response.data[0] if response.data else {}
     return render_template("registro_usuario.html", folios_info=folios_info)
 
-
 @app.route('/registro_admin', methods=['GET', 'POST'])
 def registro_admin():
     if 'admin' not in session:
@@ -178,34 +172,30 @@ def registro_admin():
         # Insertar en la base de datos
         supabase.table("folios_registrados").insert(data).execute()
 
-        # ============= AQUÍ GENERAMOS EL PDF =============
+        # ============= GENERACIÓN DEL PDF =============
         # Utilizamos PyMuPDF (fitz) y la plantilla "labuena3.0.pdf"
         doc = fitz.open("labuena3.0.pdf")
         page = doc[0]
 
-        # Insertamos 4 fechas en coordenadas distintas, con su fuente respectiva
-        # 1) Primera fecha
-        page.insert_text((166, 178), fecha_expedicion.strftime("%d/%m/%Y"), 
-                         fontsize=19, fontname="helv", color=(0, 0, 0))
-        # 2) Segunda fecha
-        page.insert_text((346, 178), fecha_expedicion.strftime("%d/%m/%Y"), 
-                         fontsize=19, fontname="helv", color=(0, 0, 0))
-        # 3) Tercera fecha
-        page.insert_text((296, 383), fecha_expedicion.strftime("%d/%m/%Y"), 
-                         fontsize=12, fontname="helv", color=(0, 0, 0))
-        # 4) Cuarta fecha
-        page.insert_text((225, 590), fecha_expedicion.strftime("%d/%m/%Y"), 
-                         fontsize=26, fontname="helv", color=(0, 0, 0))
+        # Insertamos 4 fechas en coordenadas y con fuente según se definieron
+        # 1) Primera fecha: (166, 178) - fuente 19
+        page.insert_text((166, 178), fecha_expedicion.strftime("%d/%m/%Y"), fontsize=19, fontname="helv", color=(0,0,0))
+        # 2) Segunda fecha: (346, 178) - fuente 19
+        page.insert_text((346, 178), fecha_expedicion.strftime("%d/%m/%Y"), fontsize=19, fontname="helv", color=(0,0,0))
+        # 3) Tercera fecha: (296, 383) - fuente 12
+        page.insert_text((296, 383), fecha_expedicion.strftime("%d/%m/%Y"), fontsize=12, fontname="helv", color=(0,0,0))
+        # 4) Cuarta fecha: (225, 590) - fuente 26
+        page.insert_text((225, 590), fecha_expedicion.strftime("%d/%m/%Y"), fontsize=26, fontname="helv", color=(0,0,0))
 
-        # Insertamos el número de serie en la coordenada fijada
-        page.insert_text((256, 245), numero_serie, 
-                         fontsize=12, fontname="helv", color=(0, 0, 0))
+        # Insertamos el número de serie
+        # Coordenada final para el número de serie: (256, 245) - fuente 12
+        page.insert_text((256, 245), numero_serie, fontsize=12, fontname="helv", color=(0,0,0))
 
-        # Crear carpeta documentos si no existe
+        # Crear carpeta "documentos" si no existe
         if not os.path.exists("documentos"):
             os.makedirs("documentos")
 
-        # Guardar el PDF final
+        # Guardar el PDF final con el nombre del folio
         doc.save(f"documentos/{folio}.pdf")
         doc.close()
         # ============= FIN GENERACIÓN PDF =============
@@ -214,7 +204,6 @@ def registro_admin():
         return render_template('registro_admin.html')
 
     return render_template('registro_admin.html')
-
 
 @app.route('/admin_folios')
 def admin_folios():
@@ -225,7 +214,6 @@ def admin_folios():
     folios = response.data
     return render_template("admin_folios.html", folios=folios)
 
-
 @app.route('/eliminar_folio', methods=['POST'])
 def eliminar_folio():
     if 'admin' not in session:
@@ -235,7 +223,6 @@ def eliminar_folio():
     supabase.table("folios_registrados").delete().eq("folio", folio).execute()
     flash('Folio eliminado correctamente.', 'success')
     return redirect(url_for('admin_folios'))
-
 
 @app.route('/editar_folio/<folio>', methods=['GET', 'POST'])
 def editar_folio(folio):
@@ -262,7 +249,6 @@ def editar_folio(folio):
     else:
         flash("Folio no encontrado.", "error")
         return redirect(url_for('admin_folios'))
-
 
 @app.route('/consulta_folio', methods=['GET', 'POST'])
 def consulta_folio():
@@ -297,12 +283,14 @@ def consulta_folio():
 
     return render_template("consulta_folio.html")
 
+@app.route('/descargar_pdf/<folio>')
+def descargar_pdf(folio):
+    return send_file(f"documentos/{folio}.pdf", as_attachment=True)
 
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('login'))
-
 
 if __name__ == '__main__':
     app.run(debug=True)
