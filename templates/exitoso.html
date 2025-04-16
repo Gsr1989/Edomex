@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registro Exitoso</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      background-color: #ffffff;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    .contenido {
+      margin: 40px auto;
+      padding: 20px;
+      max-width: 600px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      margin-top: 20px;
+      background-color: #800000;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+    .btn:hover {
+      background-color: #a00000;
+    }
+  </style>
+</head>
+<body>
+  <div class="contenido">
+    <h1>Registro Exitoso</h1>
+    <p>Folio: {{ folio }}</p>
+    <p>Número de Serie: {{ serie }}</p>
+    <p>Fecha de Generación: {{ fecha_generacion }}</p>
+    <a href="{{ url_for('descargar_pdf', folio=folio) }}" class="btn">Descargar PDF</a>
+    <br>
+    <a href="{{ url_for('admin') }}" class="btn">Volver al Panel</a>
+  </div>
+</body>
+</html>
