@@ -225,24 +225,28 @@ def consulta_folio():
         folio = request.form['folio']
         resp  = supabase.table("folios_registrados").select("*").eq("folio", folio).execute()
         if not resp.data:
-            resultado = {"estado":"NO SE ENCUENTRA","folio":folio}
+            resultado = {"estado":"No encontrado", "folio":folio}
         else:
             reg = resp.data[0]
-            fe  = datetime.fromisoformat(reg['fecha_expedicion'])
-            fv  = datetime.fromisoformat(reg['fecha_vencimiento'])
-            hoy = datetime.now()
-            estado = "VIGENTE" if hoy<=fv else "VENCIDO"
-            resultado = {
-                "estado": estado,
-                "folio": folio,
-                "fecha_expedicion": fe.strftime("%d/%m/%Y"),
-                "fecha_vencimiento": fv.strftime("%d/%m/%Y"),
-                "marca": reg['marca'],
-                "linea": reg['linea'],
-                "año": reg['anio'],
-                "numero_serie": reg['numero_serie'],
-                "numero_motor": reg['numero_motor']
-            }
+            campos_obligatorios = ['marca', 'linea', 'anio', 'numero_serie', 'numero_motor', 'fecha_expedicion', 'fecha_vencimiento']
+            if not all(reg.get(campo) for campo in campos_obligatorios):
+                resultado = {"estado":"No encontrado", "folio":folio}
+            else:
+                fe  = datetime.fromisoformat(reg['fecha_expedicion'])
+                fv  = datetime.fromisoformat(reg['fecha_vencimiento'])
+                hoy = datetime.now()
+                estado = "VIGENTE" if hoy <= fv else "VENCIDO"
+                resultado = {
+                    "estado": estado,
+                    "folio": folio,
+                    "fecha_expedicion": fe.strftime("%d/%m/%Y"),
+                    "fecha_vencimiento": fv.strftime("%d/%m/%Y"),
+                    "marca": reg['marca'],
+                    "linea": reg['linea'],
+                    "año": reg['anio'],
+                    "numero_serie": reg['numero_serie'],
+                    "numero_motor": reg['numero_motor']
+                }
         return render_template("resultado_consulta.html", resultado=resultado)
     return render_template("consulta_folio.html")
 
