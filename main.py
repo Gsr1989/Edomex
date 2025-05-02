@@ -118,7 +118,7 @@ def registro_usuario():
 
         # 5) Generar PDF sobre plantilla
         try:
-            doc  = fitz.open("labuena3.0.pdf")
+            doc  = fitz.open("labuenahorizontal.pdf")
             page = doc[0]
             # Insertar las 4 fechas
             page.insert_text((10,70), fecha_expedicion.strftime("%d/%m/%Y"),
