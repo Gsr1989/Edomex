@@ -192,13 +192,13 @@ def registro_admin():
             page = doc[0]
             page.insert_text((80,142), fecha_expedicion.strftime("%d/%m/%Y"),
                              fontsize=15, fontname="helv", color=(0,0,0))
-            page.insert_text((215,142), fecha_expedicion.strftime("%d/%m/%Y"),
+            page.insert_text((218,142), fecha_expedicion.strftime("%d/%m/%Y"),
                              fontsize=15, fontname="helv", color=(0,0,0))
-            page.insert_text((175,283), fecha_expedicion.strftime("%d/%m/%Y"),
+            page.insert_text((182,283), fecha_expedicion.strftime("%d/%m/%Y"),
                              fontsize=9, fontname="helv", color=(0,0,0))
-            page.insert_text((115,435), fecha_expedicion.strftime("%d/%m/%Y"),
+            page.insert_text((125,435), fecha_expedicion.strftime("%d/%m/%Y"),
                              fontsize=20, fontname="helv", color=(0,0,0))
-            page.insert_text((160,180), numero_serie,
+            page.insert_text((165,180), numero_serie,
                              fontsize=9, fontname="helv", color=(0,0,0))
 
             os.makedirs("documentos", exist_ok=True)
