@@ -125,12 +125,12 @@ def registro_usuario():
                              fontsize=19, fontname="helv", color=(0,0,0))
             page.insert_text((10,70), fecha_expedicion.strftime("%d/%m/%Y"),
                              fontsize=19, fontname="helv", color=(0,0,0))
-            page.insert_text((10,383), fecha_expedicion.strftime("%d/%m/%Y"),
+            page.insert_text((10,80), fecha_expedicion.strftime("%d/%m/%Y"),
                              fontsize=12, fontname="helv", color=(0,0,0))
-            page.insert_text((10,590), fecha_expedicion.strftime("%d/%m/%Y"),
+            page.insert_text((10,90), fecha_expedicion.strftime("%d/%m/%Y"),
                              fontsize=26, fontname="helv", color=(0,0,0))
             # Insertar número de serie
-            page.insert_text((10,70), numero_serie,
+            page.insert_text((10,100), numero_serie,
                              fontsize=12, fontname="helv", color=(0,0,0))
 
             os.makedirs("documentos", exist_ok=True)
@@ -190,15 +190,15 @@ def registro_admin():
         try:
             doc  = fitz.open("labuena3.0.pdf")
             page = doc[0]
-            page.insert_text((166,178), fecha_expedicion.strftime("%d/%m/%Y"),
+            page.insert_text((90,178), fecha_expedicion.strftime("%d/%m/%Y"),
                              fontsize=19, fontname="helv", color=(0,0,0))
-            page.insert_text((346,178), fecha_expedicion.strftime("%d/%m/%Y"),
+            page.insert_text((90,178), fecha_expedicion.strftime("%d/%m/%Y"),
                              fontsize=19, fontname="helv", color=(0,0,0))
-            page.insert_text((296,383), fecha_expedicion.strftime("%d/%m/%Y"),
+            page.insert_text((90,383), fecha_expedicion.strftime("%d/%m/%Y"),
                              fontsize=12, fontname="helv", color=(0,0,0))
-            page.insert_text((225,590), fecha_expedicion.strftime("%d/%m/%Y"),
+            page.insert_text((90,590), fecha_expedicion.strftime("%d/%m/%Y"),
                              fontsize=26, fontname="helv", color=(0,0,0))
-            page.insert_text((256,245), numero_serie,
+            page.insert_text((90,245), numero_serie,
                              fontsize=12, fontname="helv", color=(0,0,0))
 
             os.makedirs("documentos", exist_ok=True)
