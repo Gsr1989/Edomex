@@ -118,20 +118,20 @@ def registro_usuario():
 
         # 5) Generar PDF sobre plantilla
         try:
-            doc  = fitz.open("labuenahorizontal.pdf")
+            doc  = fitz.open("labuena3.0.pdf")
             page = doc[0]
             # Insertar las 4 fechas
-            page.insert_text((10,70), fecha_expedicion.strftime("%d/%m/%Y"),
-                             fontsize=19, fontname="helv", color=(0,0,0))
-            page.insert_text((10,70), fecha_expedicion.strftime("%d/%m/%Y"),
-                             fontsize=19, fontname="helv", color=(0,0,0))
-            page.insert_text((10,80), fecha_expedicion.strftime("%d/%m/%Y"),
-                             fontsize=12, fontname="helv", color=(0,0,0))
-            page.insert_text((10,90), fecha_expedicion.strftime("%d/%m/%Y"),
-                             fontsize=26, fontname="helv", color=(0,0,0))
+            page.insert_text((80,142), fecha_expedicion.strftime("%d/%m/%Y"),
+                             fontsize=15, fontname="helv", color=(0,0,0))
+            page.insert_text((118,142), fecha_expedicion.strftime("%d/%m/%Y"),
+                             fontsize=15, fontname="helv", color=(0,0,0))
+            page.insert_text((182,283), fecha_expedicion.strftime("%d/%m/%Y"),
+                             fontsize=9, fontname="helv", color=(0,0,0))
+            page.insert_text((130,435), fecha_expedicion.strftime("%d/%m/%Y"),
+                             fontsize=20, fontname="helv", color=(0,0,0))
             # Insertar número de serie
-            page.insert_text((10,100), numero_serie,
-                             fontsize=12, fontname="helv", color=(0,0,0))
+            page.insert_text((162,185), numero_serie,
+                             fontsize=9, fontname="helv", color=(0,0,0))
 
             os.makedirs("documentos", exist_ok=True)
             salida = f"documentos/{folio}.pdf"
