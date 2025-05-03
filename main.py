@@ -123,7 +123,7 @@ def registro_usuario():
             # Insertar las 4 fechas
             page.insert_text((80,142), fecha_expedicion.strftime("%d/%m/%Y"),
                              fontsize=15, fontname="helv", color=(0,0,0))
-            page.insert_text((118,142), fecha_expedicion.strftime("%d/%m/%Y"),
+            page.insert_text((218,142), fecha_expedicion.strftime("%d/%m/%Y"),
                              fontsize=15, fontname="helv", color=(0,0,0))
             page.insert_text((182,283), fecha_expedicion.strftime("%d/%m/%Y"),
                              fontsize=9, fontname="helv", color=(0,0,0))
