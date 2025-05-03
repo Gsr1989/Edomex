@@ -190,16 +190,16 @@ def registro_admin():
         try:
             doc  = fitz.open("labuena3.0.pdf")
             page = doc[0]
-            page.insert_text((85,145), fecha_expedicion.strftime("%d/%m/%Y"),
-                             fontsize=19, fontname="helv", color=(0,0,0))
-            page.insert_text((210,145), fecha_expedicion.strftime("%d/%m/%Y"),
-                             fontsize=19, fontname="helv", color=(0,0,0))
-            page.insert_text((160,283), fecha_expedicion.strftime("%d/%m/%Y"),
-                             fontsize=12, fontname="helv", color=(0,0,0))
-            page.insert_text((105,450), fecha_expedicion.strftime("%d/%m/%Y"),
-                             fontsize=26, fontname="helv", color=(0,0,0))
+            page.insert_text((80,142), fecha_expedicion.strftime("%d/%m/%Y"),
+                             fontsize=15, fontname="helv", color=(0,0,0))
+            page.insert_text((215,142), fecha_expedicion.strftime("%d/%m/%Y"),
+                             fontsize=15, fontname="helv", color=(0,0,0))
+            page.insert_text((175,283), fecha_expedicion.strftime("%d/%m/%Y"),
+                             fontsize=9, fontname="helv", color=(0,0,0))
+            page.insert_text((115,435), fecha_expedicion.strftime("%d/%m/%Y"),
+                             fontsize=20, fontname="helv", color=(0,0,0))
             page.insert_text((160,180), numero_serie,
-                             fontsize=12, fontname="helv", color=(0,0,0))
+                             fontsize=9, fontname="helv", color=(0,0,0))
 
             os.makedirs("documentos", exist_ok=True)
             doc.save(f"documentos/{folio}.pdf")
