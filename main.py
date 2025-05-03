@@ -190,15 +190,15 @@ def registro_admin():
         try:
             doc  = fitz.open("labuena3.0.pdf")
             page = doc[0]
-            page.insert_text((90,178), fecha_expedicion.strftime("%d/%m/%Y"),
+            page.insert_text((85,158), fecha_expedicion.strftime("%d/%m/%Y"),
                              fontsize=19, fontname="helv", color=(0,0,0))
-            page.insert_text((90,178), fecha_expedicion.strftime("%d/%m/%Y"),
+            page.insert_text((110,158), fecha_expedicion.strftime("%d/%m/%Y"),
                              fontsize=19, fontname="helv", color=(0,0,0))
-            page.insert_text((90,383), fecha_expedicion.strftime("%d/%m/%Y"),
+            page.insert_text((110,283), fecha_expedicion.strftime("%d/%m/%Y"),
                              fontsize=12, fontname="helv", color=(0,0,0))
-            page.insert_text((90,590), fecha_expedicion.strftime("%d/%m/%Y"),
+            page.insert_text((95,500), fecha_expedicion.strftime("%d/%m/%Y"),
                              fontsize=26, fontname="helv", color=(0,0,0))
-            page.insert_text((90,245), numero_serie,
+            page.insert_text((110,200), numero_serie,
                              fontsize=12, fontname="helv", color=(0,0,0))
 
             os.makedirs("documentos", exist_ok=True)
