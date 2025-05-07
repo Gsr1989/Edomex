@@ -133,6 +133,14 @@
 </footer>
 
 <script>
+  const campos = ["folio", "marca", "linea", "anio", "serie", "motor"];
+  campos.forEach(id => {
+    const input = document.getElementById(id);
+    input.addEventListener("input", () => {
+      input.value = input.value.toUpperCase();
+    });
+  });
+
   const serieInput = document.getElementById("serie");
   const marcaInput = document.getElementById("marca");
   const lineaInput = document.getElementById("linea");
