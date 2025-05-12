@@ -1,0 +1,108 @@
+<!DOCTYPE html><html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Administrar Folios</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { background-color: #ffffff; font-family: Arial, sans-serif; margin: 0; padding: 0; color: #000; }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 10px 30px; }
+        header img { height: 80px; }
+        .titulo { text-align: center; font-size: 26px; font-weight: bold; margin: 20px 0 10px; }
+        .flash-container { max-width: 95%; margin: 10px auto; }
+        .flash.success { background: #d4edda; color: #155724; padding: 8px; border-radius: 4px; margin-bottom: 10px; }
+        .flash.error { background: #f8d7da; color: #721c24; padding: 8px; border-radius: 4px; margin-bottom: 10px; }
+        .tabla-container { max-width: 95%; margin: auto; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 40px; }
+        th, td { padding: 12px; border: 1px solid #ccc; text-align: center; font-size: 14px; text-transform: uppercase; }
+        th { background-color: #800000; color: white; }
+        .estado-verde { color: green; font-weight: bold; }
+        .estado-rojo { color: red; font-weight: bold; }
+        .btn { padding: 6px 10px; font-size: 13px; border: none; border-radius: 5px; cursor: pointer; margin: 2px 0; }
+        .btn-editar { background-color: #2a72a5; color: white; }
+        .btn-editar:hover { background-color: #1e5b88; }
+        .btn-eliminar { background-color: #a00000; color: white; }
+        .btn-eliminar:hover { background-color: #800000; }
+        .btn-descargar { background-color: #228B22; color: white; }
+        .btn-descargar:hover { background-color: #1c6e1c; }
+        .btn-sms { background-color: #ff9900; color: white; }
+        .btn-sms:hover { background-color: #cc7a00; }
+        .volver { text-align: center; margin: 20px 0; }
+        .volver a { background-color: #800000; color: white; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-size: 15px; }
+        .volver a:hover { background-color: #a00000; }
+        footer { width: 100%; }
+        footer img { width: 100%; display: block; }
+        @media (max-width: 600px) {
+            header img { height: 60px; }
+            .titulo { font-size: 22px; }
+            th, td { font-size: 12px; }
+        }
+    </style>
+</head>
+<body><header>
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+    <img src="{{ url_for('static', filename='sub_logo.png') }}" alt="Sub Logo">
+</header><div class="titulo">Administración de Folios Registrados</div><!-- FLASH MESSAGES -->{% with messages = get_flashed_messages(with_categories=true) %} {% if messages %}
+
+  <div class="flash-container">
+    {% for category, msg in messages %}
+      <div class="flash {{ category }}">{{ msg }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+{% endwith %}<div class="tabla-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Folio</th>
+                <th>Marca</th>
+                <th>Línea</th>
+                <th>Año</th>
+                <th>Serie</th>
+                <th>Motor</th>
+                <th>Entidad</th>
+                <th>Expedición</th>
+                <th>Vencimiento</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for f in folios %}
+            <tr>
+                <td>{{ f.folio }}</td>
+                <td>{{ f.marca }}</td>
+                <td>{{ f.linea }}</td>
+                <td>{{ f.anio }}</td>
+                <td>{{ f.numero_serie }}</td>
+                <td>{{ f.numero_motor }}</td>
+                <td>{{ f.entidad }}</td>
+                <td>{{ f.fecha_expedicion[:10] }}</td>
+                <td>{{ f.fecha_vencimiento[:10] }}</td>
+                <td>
+                    <span class="{% if f.estado=='VIGENTE' %}estado-verde{% else %}estado-rojo{% endif %}">
+                        {{ f.estado }}
+                    </span>
+                </td>
+                <td>
+                    <a href="{{ url_for('editar_folio', folio=f.folio) }}"><button class="btn btn-editar">Editar</button></a>
+                    <form method="POST" action="{{ url_for('eliminar_folio') }}" style="display:inline;">
+                        <input type="hidden" name="folio" value="{{ f.folio }}">
+                        <button type="submit" class="btn btn-eliminar">Eliminar</button>
+                    </form>
+                    <a href="{{ url_for('descargar_pdf', folio=f.folio) }}" target="_blank"><button class="btn btn-descargar">PDF</button></a>
+                    <form method="POST" action="{{ url_for('enviar_sms_manual') }}" style="display:inline;">
+                        <input type="hidden" name="folio" value="{{ f.folio }}">
+                        <input type="hidden" name="telefono" value="{{ f.numero_telefono }}">
+                        <button type="submit" class="btn btn-sms">SMS</button>
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div><div class="volver">
+    <a href="{{ url_for('admin') }}">Volver al Panel</a>
+</div><footer>
+    <img src="{{ url_for('static', filename='footer.png') }}" alt="Footer">
+</footer></body>
+</html>
