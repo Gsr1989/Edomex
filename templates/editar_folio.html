@@ -1,0 +1,119 @@
+<!DOCTYPE html><html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Editar Folio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      background-color: #ffffff;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      color: #000;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 30px;
+    }
+    header img {
+      height: 80px;
+    }
+    .titulo {
+      text-align: center;
+      font-size: 28px;
+      margin: 30px 0 10px;
+      font-weight: bold;
+      color: #222;
+    }
+    .formulario {
+      max-width: 600px;
+      margin: 30px auto;
+      padding: 20px;
+      border-radius: 10px;
+      background-color: #f9f9f9;
+    }
+    input, select {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+      text-transform: uppercase;
+    }
+    .btn {
+      background-color: #800000;
+      color: white;
+      border: none;
+      padding: 14px 22px;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      width: 100%;
+      margin-top: 15px;
+    }
+    .btn:hover {
+      background-color: #a00000;
+    }
+    .flash-message {
+      padding: 10px;
+      margin: 15px auto;
+      width: 90%;
+      max-width: 600px;
+      border-radius: 5px;
+      color: white;
+      font-weight: bold;
+      text-align: center;
+    }
+    .success { background-color: green; }
+    .error { background-color: red; }
+    .acciones {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .acciones a button {
+      width: 100%;
+    }
+    footer {
+      margin-top: 40px;
+      width: 100%;
+    }
+    footer img {
+      width: 100%;
+      display: block;
+    }
+    @media (max-width: 600px) {
+      header img { height: 60px; }
+      .titulo { font-size: 24px; }
+    }
+  </style>
+</head>
+<body><header>
+  <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+  <img src="{{ url_for('static', filename='sub_logo.png') }}" alt="Sub Logo">
+</header><div class="titulo">Editar Folio</div>{% with messages = get_flashed_messages(with_categories=true) %} {% if messages %} {% for category, msg in messages %} <div class="flash-message {{ category }}">{{ msg }}</div> {% endfor %} {% endif %} {% endwith %}
+
+<form method="POST" action="{{ url_for('editar_folio', folio=folio.folio) }}" class="formulario">
+  <input type="hidden" name="entidad" value="edomex">
+  <input type="hidden" name="folio" value="{{ folio.folio }}">  <input type="text" name="marca" value="{{ folio.marca }}" placeholder="Marca" required>
+  <input type="text" name="linea" value="{{ folio.linea }}" placeholder="Línea" required>
+  <input type="number" name="anio" value="{{ folio.anio }}" placeholder="Año" required>
+  <input type="text" name="numero_serie" value="{{ folio.numero_serie }}" placeholder="Número de Serie" required>
+  <input type="text" name="numero_motor" value="{{ folio.numero_motor }}" placeholder="Número de Motor" required><label>Fecha Expedición</label> <input type="date" name="fecha_expedicion" value="{{ folio.fecha_expedicion[:10] }}" required> <label>Fecha Vencimiento</label> <input type="date" name="fecha_vencimiento" value="{{ folio.fecha_vencimiento[:10] }}" required>
+
+<button type="submit" class="btn">Actualizar Folio</button>
+
+  <div class="acciones">
+    <a href="{{ url_for('admin') }}"><button type="button" class="btn">Volver al Panel</button></a>
+    <a href="{{ url_for('consulta_folio') }}"><button type="button" class="btn">Consultar Folio</button></a>
+    <a href="{{ url_for('logout') }}"><button type="button" class="btn">Cerrar Sesión</button></a>
+  </div>
+</form><footer>
+  <img src="{{ url_for('static', filename='footer.png') }}" alt="Footer">
+</footer></body>
+</html>
