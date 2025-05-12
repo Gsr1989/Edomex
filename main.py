@@ -12,6 +12,9 @@ SUPABASE_URL = "https://xsagwqepoljfsogusubw.supabase.co"
 SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhzYWd3cWVwb2xqZnNvZ3VzdWJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM5NjM3NTUsImV4cCI6MjA1OTUzOTc1NX0.NUixULn0m2o49At8j6X58UqbXre2O2_JStqzls_8Gws"
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
+# ENTIDAD FIJA PARA ESTE SISTEMA
+ENTIDAD = "edomex"
+
 @app.route('/')
 def inicio():
     return redirect(url_for('login'))
@@ -101,7 +104,7 @@ def registro_usuario():
         fecha_expedicion  = datetime.now()
         fecha_vencimiento = fecha_expedicion + timedelta(days=vigencia)
 
-        # 4) Insertar en BD
+        # 4) Insertar en BD con entidad
         supabase.table("folios_registrados").insert({
             "folio": folio,
             "marca": marca,
@@ -110,7 +113,8 @@ def registro_usuario():
             "numero_serie": numero_serie,
             "numero_motor": numero_motor,
             "fecha_expedicion": fecha_expedicion.isoformat(),
-            "fecha_vencimiento": fecha_vencimiento.isoformat()
+            "fecha_vencimiento": fecha_vencimiento.isoformat(),
+            "entidad": ENTIDAD
         }).execute()
         supabase.table("verificaciondigitalcdmx").update({
             "folios_usados": info['folios_usados'] + 1
@@ -175,6 +179,7 @@ def registro_admin():
         fecha_expedicion  = datetime.now()
         fecha_vencimiento = fecha_expedicion + timedelta(days=vigencia)
 
+        # Insertar con entidad
         supabase.table("folios_registrados").insert({
             "folio": folio,
             "marca": marca,
@@ -183,7 +188,8 @@ def registro_admin():
             "numero_serie": numero_serie,
             "numero_motor": numero_motor,
             "fecha_expedicion": fecha_expedicion.isoformat(),
-            "fecha_vencimiento": fecha_vencimiento.isoformat()
+            "fecha_vencimiento": fecha_vencimiento.isoformat(),
+            "entidad": ENTIDAD
         }).execute()
 
         # Generar PDF igual que en registro_usuario
@@ -222,31 +228,27 @@ def descargar_pdf(folio):
 def consulta_folio():
     resultado = None
     if request.method == 'POST':
-        folio = request.form['folio']
-        resp  = supabase.table("folios_registrados").select("*").eq("folio", folio).execute()
+        fol = request.form['folio']
+        resp = supabase.table("folios_registrados").select("*").eq("folio", fol).execute()
         if not resp.data:
-            resultado = {"estado":"No encontrado", "folio":folio}
+            resultado = {"estado":"No encontrado", "folio":fol}
         else:
             reg = resp.data[0]
-            campos_obligatorios = ['marca', 'linea', 'anio', 'numero_serie', 'numero_motor', 'fecha_expedicion', 'fecha_vencimiento']
-            if not all(reg.get(campo) for campo in campos_obligatorios):
-                resultado = {"estado":"No encontrado", "folio":folio}
-            else:
-                fe  = datetime.fromisoformat(reg['fecha_expedicion'])
-                fv  = datetime.fromisoformat(reg['fecha_vencimiento'])
-                hoy = datetime.now()
-                estado = "VIGENTE" if hoy <= fv else "VENCIDO"
-                resultado = {
-                    "estado": estado,
-                    "folio": folio,
-                    "fecha_expedicion": fe.strftime("%d/%m/%Y"),
-                    "fecha_vencimiento": fv.strftime("%d/%m/%Y"),
-                    "marca": reg['marca'],
-                    "linea": reg['linea'],
-                    "año": reg['anio'],
-                    "numero_serie": reg['numero_serie'],
-                    "numero_motor": reg['numero_motor']
-                }
+            fe  = datetime.fromisoformat(reg['fecha_expedicion'])
+            fv  = datetime.fromisoformat(reg['fecha_vencimiento'])
+            estado = "VIGENTE" if datetime.now() <= fv else "VENCIDO"
+            resultado = {
+                "estado": estado,
+                "folio": fol,
+                "fecha_expedicion": fe.strftime("%d/%m/%Y"),
+                "fecha_vencimiento": fv.strftime("%d/%m/%Y"),
+                "marca": reg['marca'],
+                "linea": reg['linea'],
+                "año": reg['anio'],
+                "numero_serie": reg['numero_serie'],
+                "numero_motor": reg['numero_motor'],
+                "entidad": reg.get('entidad', '')
+            }
         return render_template("resultado_consulta.html", resultado=resultado)
     return render_template("consulta_folio.html")
 
@@ -269,7 +271,8 @@ def editar_folio(folio):
             "numero_serie": request.form['numero_serie'],
             "numero_motor": request.form['numero_motor'],
             "fecha_expedicion": request.form['fecha_expedicion'],
-            "fecha_vencimiento": request.form['fecha_vencimiento']
+            "fecha_vencimiento": request.form['fecha_vencimiento'],
+            "entidad": ENTIDAD
         }
         supabase.table("folios_registrados").update(data).eq("folio", folio).execute()
         flash("Folio actualizado correctamente.", "success")
