@@ -228,7 +228,7 @@ def descargar_pdf(folio):
 def consulta_folio():
     resultado = None
     if request.method == 'POST':
-        fol = request.form['folio']
+        folio = request.form['folio'].strip().upper()
         resp = supabase.table("folios_registrados").select("*").eq("folio", fol).execute()
         if not resp.data:
             resultado = {"estado":"No encontrado", "folio":fol}
