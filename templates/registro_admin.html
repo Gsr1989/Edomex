@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="es">
+<!DOCTYPE html>
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <title>Registro de Folio (Admin)</title>
@@ -28,7 +29,7 @@
       border-radius: 10px;
       background-color: #f9f9f9;
     }
-    input, select {
+    input {
       width: 100%;
       padding: 12px;
       margin: 10px 0;
@@ -129,29 +130,36 @@
 </footer>
 
 <script>
-  const campos = ["folio", "marca", "linea", "anio", "serie", "motor"];
-  campos.forEach(id => {
-    const input = document.getElementById(id);
-    input.addEventListener("input", () => {
-      input.value = input.value.toUpperCase();
+  const ids = ["folio", "marca", "linea", "anio", "serie", "motor"];
+  const inputs = {};
+  ids.forEach(id => {
+    inputs[id] = document.getElementById(id);
+    inputs[id].addEventListener("input", () => {
+      inputs[id].value = inputs[id].value.toUpperCase();
     });
   });
 
-  const serieInput = document.getElementById("serie");
-  const marcaInput = document.getElementById("marca");
-  const lineaInput = document.getElementById("linea");
-  const anioInput = document.getElementById("anio");
-
-  serieInput.addEventListener("input", () => {
-    const vin = serieInput.value.trim().toUpperCase();
+  // Detectar VIN y autocompletar + saltar entre campos
+  const vinInput = inputs.serie;
+  vinInput.addEventListener("input", () => {
+    const vin = vinInput.value.trim().toUpperCase();
     if (vin.length >= 11) {
       fetch(`https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValuesExtended/${vin}?format=json`)
         .then(res => res.json())
         .then(data => {
           const r = data.Results[0];
-          if (r.Make) marcaInput.value = r.Make.toUpperCase();
-          if (r.Model) lineaInput.value = r.Model.toUpperCase();
-          if (r.ModelYear) anioInput.value = r.ModelYear;
+          if (r.Make && inputs.marca.value === "") {
+            inputs.marca.value = r.Make.toUpperCase();
+            inputs.linea.focus();
+          }
+          if (r.Model && inputs.linea.value === "") {
+            inputs.linea.value = r.Model.toUpperCase();
+            inputs.anio.focus();
+          }
+          if (r.ModelYear && inputs.anio.value === "") {
+            inputs.anio.value = r.ModelYear;
+            inputs.motor.focus();
+          }
         });
     }
   });
