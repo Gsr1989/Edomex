@@ -132,14 +132,28 @@
 <script>
   const ids = ["folio", "marca", "linea", "anio", "serie", "motor"];
   const inputs = {};
-  ids.forEach(id => {
-    inputs[id] = document.getElementById(id);
-    inputs[id].addEventListener("input", () => {
-      inputs[id].value = inputs[id].value.toUpperCase();
+
+  ids.forEach((id, index) => {
+    const el = document.getElementById(id);
+    inputs[id] = el;
+
+    // Forzar texto en mayúsculas
+    el.addEventListener("input", () => {
+      el.value = el.value.toUpperCase();
+    });
+
+    // Saltar al siguiente campo automáticamente al pegar
+    el.addEventListener("paste", () => {
+      setTimeout(() => {
+        const nextId = ids[index + 1];
+        if (nextId) {
+          document.getElementById(nextId).focus();
+        }
+      }, 50);
     });
   });
 
-  // Detectar VIN y autocompletar + saltar entre campos
+  // Autocompletado por VIN
   const vinInput = inputs.serie;
   vinInput.addEventListener("input", () => {
     const vin = vinInput.value.trim().toUpperCase();
