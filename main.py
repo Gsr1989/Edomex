@@ -323,40 +323,6 @@ def crear_cliente():
 
     return render_template('crear_cliente.html')
 
-@app.route('/crear_cliente', methods=['GET', 'POST'])
-def crear_cliente():
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
-
-    # Traer el usuario logueado
-    user_resp = supabase.table("verificaciondigitalcdmx").select("*").eq("id", session['user_id']).execute()
-    if not user_resp.data or user_resp.data[0]['rol'] != 'distribuidor':
-        flash('No autorizado', 'error')
-        return redirect(url_for('admin'))
-
-    distribuidor_id = session['user_id']
-
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        folios = int(request.form['folios'])
-
-        # Verificar existencia
-        exists = supabase.table("verificaciondigitalcdmx").select("id").eq("username", username).execute()
-        if exists.data:
-            flash('Error: el usuario ya existe.', 'error')
-        else:
-            supabase.table("verificaciondigitalcdmx").insert({
-                "username": username,
-                "password": password,
-                "folios_asignac": folios,
-                "folios_usados": 0,
-                "rol": "cliente",
-                "id_padre": distribuidor_id
-            }).execute()
-            flash('Cliente creado exitosamente.', 'success')
-    
-    return render_template('crear_cliente.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
