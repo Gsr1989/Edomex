@@ -73,6 +73,8 @@
 
 <div class="titulo">Panel de Administración</div>
 
+<a href="{{ url_for('crear_cliente') }}"><button class="btn">Crear Cliente</button></a>
+    
 <div class="botones">
     {% if session.get('admin') %}
         <a href="{{ url_for('registro_admin') }}"><button class="btn">Registrar Folio</button></a>
