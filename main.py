@@ -39,27 +39,6 @@ def admin():
         return redirect(url_for('login'))
     return render_template('panel.html')
 
-@app.route('/crear_usuario', methods=['GET','POST'])
-def crear_usuario():
-    if 'admin' not in session:
-        return redirect(url_for('login'))
-    if request.method == 'POST':
-        u = request.form['username']
-        p = request.form['password']
-        fol = int(request.form['folios'])
-        exists = supabase.table("verificaciondigitalcdmx").select("id").eq("username", u).execute()
-        if exists.data:
-            flash('Error: el usuario ya existe.', 'error')
-        else:
-            supabase.table("verificaciondigitalcdmx").insert({
-                "username": u,
-                "password": p,
-                "folios_asignac": fol,
-                "folios_usados": 0
-            }).execute()
-            flash('Usuario creado exitosamente.', 'success')
-    return render_template('crear_usuario.html')
-
 @app.route('/registro_usuario', methods=['GET','POST'])
 def registro_usuario():
     if 'user_id' not in session:
