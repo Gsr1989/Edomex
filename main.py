@@ -323,6 +323,35 @@ def crear_cliente():
 
     return render_template('crear_cliente.html')
 
+@app.route('/crear_usuario_hijo', methods=['GET', 'POST'])
+def crear_usuario_hijo():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+
+    # Verifica que sea distribuidor
+    user_data = supabase.table("usuarios").select("*").eq("nombre_de_usuario", session["user"]).execute().data
+    if not user_data or user_data[0].get("rol") != "distribuidor":
+        return "No autorizado"
+
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        folios = request.form['folios']
+
+        supabase.table("usuarios").insert({
+            "nombre_de_usuario": username,
+            "contraseña": password,
+            "folios_asignac": int(folios),
+            "folios_usados": 0,
+            "rol": "vendedor",
+            "id_padre": user_data[0]["id"]
+        }).execute()
+
+        flash('Usuario creado exitosamente', 'success')
+        return redirect(url_for('crear_usuario_hijo'))
+
+    return render_template('crear_usuario_hijo.html')
+
 
 if __name__ == '__main__':
     app.run(debug=True)
