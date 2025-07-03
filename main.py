@@ -287,5 +287,62 @@ def crear_usuario():
     
     return render_template('crear_usuario.html')
 
+@app.route('/crear_cliente', methods=['GET', 'POST'])
+def crear_cliente():
+    # Debe ser distribuidor para entrar
+    if 'user_id' not in session or session.get('rol') != 'distribuidor':
+        flash('Acceso no autorizado.', 'error')
+        return redirect(url_for('login'))
+
+    distribuidor_id = session['user_id']
+
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        folios_asignados = int(request.form['folios'])
+
+        # 1️⃣ Verificar saldo del distribuidor
+        datos_distribuidor = supabase.table("verificaciondigitalcdmx")\
+            .select("folios_asignac", "folios_usados")\
+            .eq("id", distribuidor_id).execute().data
+
+        if not datos_distribuidor:
+            flash('Error al obtener información del distribuidor.', 'error')
+            return redirect(url_for('crear_cliente'))
+
+        saldo_disponible = datos_distribuidor[0]['folios_asignac'] - datos_distribuidor[0]['folios_usados']
+        if folios_asignados > saldo_disponible:
+            flash('No tienes suficientes folios para asignar.', 'error')
+            return redirect(url_for('crear_cliente'))
+
+        # 2️⃣ Verificar que el username no exista ya
+        existe = supabase.table("verificaciondigitalcdmx")\
+            .select("id")\
+            .eq("username", username)\
+            .execute()
+        if existe.data:
+            flash('Error: el nombre de usuario ya existe.', 'error')
+            return redirect(url_for('crear_cliente'))
+
+        # 3️⃣ Crear el cliente
+        supabase.table("verificaciondigitalcdmx").insert({
+            "username": username,
+            "password": password,
+            "rol": "cliente",
+            "parent_id": distribuidor_id,
+            "folios_asignac": folios_asignados,
+            "folios_usados": 0
+        }).execute()
+
+        # 4️⃣ Descontar los folios del distribuidor
+        supabase.table("verificaciondigitalcdmx").update({
+            "folios_usados": datos_distribuidor[0]['folios_usados'] + folios_asignados
+        }).eq("id", distribuidor_id).execute()
+
+        flash('Cliente creado exitosamente.', 'success')
+        return redirect(url_for('crear_cliente'))
+
+    return render_template('crear_cliente.html')
+
 if __name__ == '__main__':
     app.run(debug=True)
