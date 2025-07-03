@@ -67,23 +67,30 @@
 </head>
 <body>
 
-    <header>
-        <img src="{{ url_for('static', filename='foliox.jpg') }}" alt="Encabezado">
-    </header>
+<header>
+    <img src="{{ url_for('static', filename='foliox.jpg') }}" alt="Encabezado">
+</header>
 
-    <div class="titulo">Panel de Administración</div>
+<div class="titulo">Panel de Administración</div>
 
-    <div class="botones">
+<div class="botones">
+    {% if session.get('admin') %}
         <a href="{{ url_for('registro_admin') }}"><button class="btn">Registrar Folio</button></a>
         <a href="{{ url_for('consulta_folio') }}"><button class="btn">Consultar Folio</button></a>
         <a href="{{ url_for('crear_usuario') }}"><button class="btn">Crear Usuario</button></a>
         <a href="{{ url_for('admin_folios') }}"><button class="btn">Ver Folios Registrados</button></a>
-        <a href="{{ url_for('logout') }}"><button class="btn">Cerrar Sesión</button></a>
-    </div>
+    {% elif session.get('rol') == 'distribuidor' %}
+        <a href="{{ url_for('crear_cliente') }}"><button class="btn">Crear Cliente</button></a>
+        <a href="{{ url_for('consulta_folio') }}"><button class="btn">Consultar Folio</button></a>
+    {% elif session.get('rol') == 'cliente' %}
+        <a href="{{ url_for('consulta_folio') }}"><button class="btn">Consultar Folio</button></a>
+    {% endif %}
+    <a href="{{ url_for('logout') }}"><button class="btn">Cerrar Sesión</button></a>
+</div>
 
-    <footer>
-        <img src="{{ url_for('static', filename='pies.jpg') }}" alt="Pie de página">
-    </footer>
+<footer>
+    <img src="{{ url_for('static', filename='pies.jpg') }}" alt="Pie de página">
+</footer>
 
 </body>
 </html>
