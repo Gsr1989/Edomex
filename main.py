@@ -253,5 +253,39 @@ def logout():
     session.clear()
     return redirect(url_for('login'))
 
+@app.route('/crear_usuario', methods=['GET','POST'])
+def crear_usuario():
+    if 'admin' not in session:
+        return redirect(url_for('login'))
+    
+    if request.method == 'POST':
+        u = request.form['username']
+        p = request.form['password']
+        fol = int(request.form['folios'])
+        rol = request.form['rol']
+        
+        # Verificar si ya existe
+        exists = supabase.table("verificaciondigitalcdmx")\
+            .select("id")\
+            .eq("username", u)\
+            .execute()
+        if exists.data:
+            flash('Error: el usuario ya existe.', 'error')
+            return render_template('crear_usuario.html')
+        
+        # Insertar nuevo usuario
+        supabase.table("verificaciondigitalcdmx").insert({
+            "username": u,
+            "password": p,
+            "rol": rol,
+            "parent_id": None,   # Admin supremo
+            "folios_asignac": fol,
+            "folios_usados": 0
+        }).execute()
+        
+        flash('Usuario creado exitosamente.', 'success')
+    
+    return render_template('crear_usuario.html')
+
 if __name__ == '__main__':
     app.run(debug=True)
