@@ -47,6 +47,7 @@
             cursor: pointer;
             text-align: center;
             width: 100%;
+            transition: background-color 0.3s ease;
         }
 
         .btn:hover {
@@ -76,6 +77,7 @@
         <a href="{{ url_for('registro_admin') }}"><button class="btn">Registrar Folio</button></a>
         <a href="{{ url_for('consulta_folio') }}"><button class="btn">Consultar Folio</button></a>
         <a href="{{ url_for('crear_usuario') }}"><button class="btn">Crear Usuario</button></a>
+        <a href="{{ url_for('admin_folios') }}"><button class="btn">Ver Folios Registrados</button></a>
         <a href="{{ url_for('logout') }}"><button class="btn">Cerrar Sesión</button></a>
     </div>
 
