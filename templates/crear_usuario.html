@@ -33,7 +33,7 @@
             background-color: #f9f9f9;
         }
 
-        input {
+        input, select {
             width: 100%;
             padding: 12px;
             margin: 10px 0;
@@ -120,6 +120,14 @@
     <input type="text" name="username" placeholder="Nombre de usuario" required>
     <input type="password" name="password" placeholder="Contraseña" required>
     <input type="number" name="folios" placeholder="Cantidad de folios" required>
+    
+    <label for="rol">Rol:</label>
+    <select name="rol" id="rol" required>
+        <option value="">Selecciona rol</option>
+        <option value="distribuidor">Distribuidor</option>
+        <option value="cliente">Cliente</option>
+    </select>
+
     <button type="submit" class="btn">Crear Usuario</button>
 </form>
 
