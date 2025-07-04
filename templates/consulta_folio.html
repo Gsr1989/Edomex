@@ -44,7 +44,7 @@
         }
 
         button {
-            background-color: #5a5eaa;
+            background-color: #800000;
             color: white;
             padding: 12px 20px;
             border: none;
@@ -52,15 +52,21 @@
             font-size: 16px;
             cursor: pointer;
             width: 100%;
+            transition: background-color 0.3s ease;
+            font-weight: bold;
         }
 
         button:hover {
-            background-color: #4c4f95;
+            background-color: #660000;
         }
 
         footer {
             margin-top: 40px;
             width: 100%;
+        }
+
+        footer a {
+            display: block;
         }
 
         footer img {
@@ -86,7 +92,9 @@
     </main>
 
     <footer>
-        <img src="{{ url_for('static', filename='pies.jpg') }}" alt="Pie de página">
+        <a href="http://sistemas2.edomex.gob.mx/TramitesyServicios/" target="_blank">
+            <img src="{{ url_for('static', filename='pies.jpg') }}" alt="Pie de página">
+        </a>
     </footer>
 
 </body>
