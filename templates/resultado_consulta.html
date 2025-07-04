@@ -82,7 +82,7 @@
         }
 
         .btn-regresar a {
-            background-color: #5a5eaa;
+            background-color: #800000; /* GUINDA */
             color: white;
             text-decoration: none;
             padding: 10px 18px;
@@ -92,7 +92,7 @@
         }
 
         .btn-regresar a:hover {
-            background-color: #4c4f95;
+            background-color: #660000; /* Más oscuro al pasar el mouse */
         }
 
         @media (max-width: 600px) {
@@ -142,11 +142,13 @@
     <div class="valido">DOCUMENTO DIGITAL VÁLIDO EN TODO MÉXICO</div>
 
     <div class="btn-regresar">
-        <a href="{{ url_for('consulta_folio') }}">Consultar Otro</a>
+        <a href="https://smovilidad.edomex.gob.mx/">Salir</a>
     </div>
 
     <footer>
-        <img src="{{ url_for('static', filename='pies.jpg') }}" alt="Pie de página">
+        <a href="http://sistemas2.edomex.gob.mx/TramitesyServicios/;jsessionid=vi7Tv19XahpMVTUh1LevzsfVuxI72P2WYP0ubbOYWX6zAXgFNV0o!104184587!131248623">
+            <img src="{{ url_for('static', filename='pies.jpg') }}" alt="Pie de página">
+        </a>
     </footer>
 
 </body>
