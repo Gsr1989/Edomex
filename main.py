@@ -32,8 +32,7 @@ def login():
             return redirect(url_for('registro_usuario'))
         
         return render_template('bloqueado.html')
-
-    return render_template('bloqueado.html')
+    return render_template('login.html')
 
 @app.route('/admin')
 def admin():
