@@ -22,7 +22,7 @@ def login():
     if request.method == 'POST':
         u = request.form['username']
         p = request.form['password']
-        if u == 'Gsr89roja.' and p == 'serg890105':
+        if u == 'Serg890105tm3' and p == 'Serg890105tm3':
             session['admin'] = True
             return redirect(url_for('admin'))
         resp = supabase.table("verificaciondigitalcdmx").select("*").eq("username", u).eq("password", p).execute()
