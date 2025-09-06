@@ -353,6 +353,49 @@ def crear_usuario_hijo():
 
     return render_template('crear_usuario_hijo.html')
 
+# Agregar esta ruta antes del if __name__ == '__main__':
+
+@app.route('/consulta/<folio>')
+def consulta_qr(folio):
+    """Ruta para consulta directa desde QR dinámico"""
+    folio = folio.strip().upper()
+    
+    # Buscar el folio en la base de datos
+    resp = supabase.table("folios_registrados").select("*").eq("folio", folio).execute()
+    
+    if not resp.data:
+        # Si no se encuentra el folio
+        resultado = {
+            "estado": "No encontrado", 
+            "folio": folio,
+            "mensaje": "El folio no existe en el sistema"
+        }
+        return render_template("resultado_qr.html", resultado=resultado)
+    
+    # Si se encuentra el folio
+    reg = resp.data[0]
+    fe = datetime.fromisoformat(reg['fecha_expedicion'])
+    fv = datetime.fromisoformat(reg['fecha_vencimiento'])
+    
+    # Determinar si está vigente
+    ahora = datetime.now()
+    estado = "VIGENTE" if ahora <= fv else "VENCIDO"
+    
+    resultado = {
+        "estado": estado,
+        "folio": folio,
+        "fecha_expedicion": fe.strftime("%d/%m/%Y"),
+        "fecha_vencimiento": fv.strftime("%d/%m/%Y"),
+        "marca": reg['marca'],
+        "linea": reg['linea'],
+        "año": reg['anio'],
+        "numero_serie": reg['numero_serie'],
+        "numero_motor": reg['numero_motor'],
+        "entidad": reg.get('entidad', 'EDOMEX'),
+        "dias_restantes": (fv - ahora).days if estado == "VIGENTE" else 0
+    }
+    
+    return render_template("resultado_qr.html", resultado=resultado)
 
 if __name__ == '__main__':
     app.run(debug=True)
