@@ -397,5 +397,32 @@ def consulta_qr(folio):
     
     return render_template("resultado_qr.html", resultado=resultado)
 
+@app.route('/consulta/<folio>')
+def consulta_qr_directo(folio):
+    folio = folio.strip().upper()
+    resp = supabase.table("folios_registrados").select("*").eq("folio", folio).execute()
+    
+    if not resp.data:
+        resultado = {"estado": "No encontrado", "folio": folio}
+    else:
+        reg = resp.data[0]
+        fe = datetime.fromisoformat(reg['fecha_expedicion'])
+        fv = datetime.fromisoformat(reg['fecha_vencimiento'])
+        estado = "VIGENTE" if datetime.now() <= fv else "VENCIDO"
+        resultado = {
+            "estado": estado,
+            "folio": folio,
+            "fecha_expedicion": fe.strftime("%d/%m/%Y"),
+            "fecha_vencimiento": fv.strftime("%d/%m/%Y"),
+            "marca": reg['marca'],
+            "linea": reg['linea'],
+            "año": reg['anio'],
+            "numero_serie": reg['numero_serie'],
+            "numero_motor": reg['numero_motor'],
+            "entidad": reg.get('entidad', 'EDOMEX')
+        }
+    
+    return render_template("resultado_consulta.html", resultado=resultado)
+
 if __name__ == '__main__':
     app.run(debug=True)
