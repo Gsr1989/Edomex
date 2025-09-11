@@ -353,8 +353,6 @@ def crear_usuario_hijo():
 
     return render_template('crear_usuario_hijo.html')
 
-# Agregar esta ruta antes del if __name__ == '__main__':
-
 @app.route('/consulta/<folio>')
 def consulta_qr(folio):
     folio = folio.strip().upper()
@@ -364,10 +362,9 @@ def consulta_qr(folio):
         resultado = {"estado": "No encontrado", "folio": folio}
     else:
         reg = resp.data[0]
-        from datetime import date
-        fe = date.fromisoformat(reg['fecha_expedicion'])
-        fv = date.fromisoformat(reg['fecha_vencimiento'])
-        estado = "VIGENTE" if date.today() <= fv else "VENCIDO"
+        fe = datetime.fromisoformat(reg['fecha_expedicion'])
+        fv = datetime.fromisoformat(reg['fecha_vencimiento'])
+        estado = "VIGENTE" if datetime.now() <= fv else "VENCIDO"
         resultado = {
             "estado": estado,
             "folio": folio,
