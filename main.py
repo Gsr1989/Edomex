@@ -650,7 +650,7 @@ def consulta_folio_directo(folio):
 
 @app.route('/descargar_recibo/<folio>')
 def descargar_recibo(folio):
-    ruta_pdf = os.path.join(OUTPUT_DIR, f"{fol io}.pdf")
+    ruta_pdf = os.path.join(OUTPUT_DIR, f"{folio}.pdf")
     if not os.path.exists(ruta_pdf):
         abort(404)
 
