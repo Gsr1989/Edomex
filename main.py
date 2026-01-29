@@ -101,14 +101,8 @@ coords_edomex = {
 PREFIJO_EDOMEX = "331"
 
 def generar_folio_automatico_edomex():
-    """
-    Genera folio con prefijo 331 + consecutivo
-    Formato: 3312, 3313, 3314... infinito
-    Intenta 10,000,000 de veces hasta encontrar uno disponible
-    """
     logger.info("[FOLIO] Iniciando generación automática EDOMEX")
     
-    # 1. TRAER TODOS LOS FOLIOS DE EDOMEX
     todos = supabase.table("folios_registrados")\
         .select("folio")\
         .eq("entidad", ENTIDAD)\
@@ -116,13 +110,11 @@ def generar_folio_automatico_edomex():
     
     logger.info(f"[FOLIO] Total folios en BD: {len(todos)}")
     
-    # 2. FILTRAR SOLO LOS QUE SON DE EDOMEX (empiezan con 331)
     consecutivos = []
     for f in todos:
         folio_str = str(f['folio'])
         if folio_str.startswith(PREFIJO_EDOMEX):
             try:
-                # Extraer el número después de "331"
                 num = int(folio_str[3:])
                 consecutivos.append(num)
             except:
@@ -130,20 +122,17 @@ def generar_folio_automatico_edomex():
     
     logger.info(f"[FOLIO] Consecutivos válidos: {len(consecutivos)}")
     
-    # 3. ENCONTRAR EL SIGUIENTE DISPONIBLE
     if not consecutivos:
-        siguiente = 2  # Empezar en 3312
+        siguiente = 2
         logger.info(f"[FOLIO] Sin folios, empezando en {PREFIJO_EDOMEX}{siguiente}")
     else:
         ultimo = max(consecutivos)
         siguiente = ultimo + 1
         logger.info(f"[FOLIO] Último: {PREFIJO_EDOMEX}{ultimo}, siguiente: {PREFIJO_EDOMEX}{siguiente}")
     
-    # 4. BUSCAR HASTA 10,000,000 DE VECES
     for intento in range(10000000):
         folio_candidato = f"{PREFIJO_EDOMEX}{siguiente + intento}"
         
-        # Verificar si existe
         existe = supabase.table("folios_registrados")\
             .select("folio")\
             .eq("folio", folio_candidato)\
@@ -154,20 +143,14 @@ def generar_folio_automatico_edomex():
             logger.info(f"[FOLIO] ✅ Encontrado: {folio_candidato} (intento {intento + 1})")
             return folio_candidato
         
-        # Log cada 10,000 intentos
         if intento > 0 and intento % 10000 == 0:
             logger.info(f"[FOLIO] Buscando... intento {intento}")
     
     raise Exception("No se encontró folio disponible después de 10,000,000 intentos")
 
 def guardar_folio_con_reintento(datos, username):
-    """
-    Guarda folio en BD con reintentos
-    Si falla por duplicado, busca el siguiente disponible
-    """
     max_intentos = 10000000
     
-    # Si no hay folio, generar uno
     if not datos.get("folio"):
         try:
             datos["folio"] = generar_folio_automatico_edomex()
@@ -180,7 +163,6 @@ def guardar_folio_con_reintento(datos, username):
     
     folio_base = datos["folio"]
     
-    # Extraer el número después de "331"
     try:
         num_inicial = int(folio_base[3:])
     except:
@@ -219,7 +201,6 @@ def guardar_folio_con_reintento(datos, username):
             logger.error(f"[ERROR BD] {e}")
             return False
         
-        # Log cada 10,000 intentos
         if intento > 0 and intento % 10000 == 0:
             logger.info(f"[DB] Guardando... intento {intento}")
     
@@ -246,7 +227,6 @@ def generar_qr_dinamico(folio):
         return None, None
 
 def generar_pdf_unificado(datos: dict) -> str:
-    """Genera UN SOLO PDF con ambas plantillas (2 páginas)"""
     fol = datos["folio"]
     fecha_exp_dt = datos["fecha_exp"]
     fecha_ven_dt = datos["fecha_ven"]
@@ -268,7 +248,6 @@ def generar_pdf_unificado(datos: dict) -> str:
     out = os.path.join(OUTPUT_DIR, f"{fol}.pdf")
 
     try:
-        # ===== PÁGINA 1: PLANTILLA PRINCIPAL =====
         doc1 = fitz.open(PLANTILLA_PDF)
         pg1 = doc1[0]
 
@@ -293,7 +272,6 @@ def generar_pdf_unificado(datos: dict) -> str:
                        fontsize=coords_edomex["nombre"][2],
                        color=coords_edomex["nombre"][3])
 
-        # QR dinámico
         img_qr, _ = generar_qr_dinamico(fol)
         
         if img_qr:
@@ -313,7 +291,6 @@ def generar_pdf_unificado(datos: dict) -> str:
                 overlay=True
             )
 
-        # ===== PÁGINA 2: PLANTILLA SIMPLE =====
         doc2 = fitz.open(PLANTILLA_BUENO)
         pg2 = doc2[0]
         
@@ -323,7 +300,6 @@ def generar_pdf_unificado(datos: dict) -> str:
         pg2.insert_text((130, 435), fecha_exp_dt.strftime("%d/%m/%Y"), fontsize=20, fontname="helv", color=(0, 0, 0))
         pg2.insert_text((162, 185), datos["serie"], fontsize=9, fontname="helv", color=(0, 0, 0))
 
-        # ===== UNIR AMBAS PÁGINAS =====
         doc_final = fitz.open()
         doc_final.insert_pdf(doc1)
         doc_final.insert_pdf(doc2)
@@ -500,6 +476,7 @@ def registro_usuario():
 @app.route('/mis_permisos')
 def mis_permisos():
     if not session.get('username') or session.get('admin'):
+        flash('Acceso denegado.', 'error')
         return redirect(url_for('login'))
 
     permisos = supabase.table("folios_registrados")\
@@ -673,7 +650,7 @@ def consulta_folio_directo(folio):
 
 @app.route('/descargar_recibo/<folio>')
 def descargar_recibo(folio):
-    ruta_pdf = os.path.join(OUTPUT_DIR, f"{folio}.pdf")
+    ruta_pdf = os.path.join(OUTPUT_DIR, f"{fol io}.pdf")
     if not os.path.exists(ruta_pdf):
         abort(404)
 
