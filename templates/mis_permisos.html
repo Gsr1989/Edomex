@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mis Permisos - Estado de México</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #fff;
+        }
+
+        header img {
+            width: 100%;
+            display: block;
+        }
+
+        .titulo {
+            text-align: center;
+            font-size: 26px;
+            margin: 25px 0 15px;
+            font-weight: bold;
+            color: #222;
+        }
+
+        .info-folios {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .info-folios h3 {
+            margin: 0 0 10px 0;
+            color: #800000;
+            font-size: 20px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+            gap: 10px;
+        }
+
+        .stat-box {
+            flex: 1;
+            padding: 12px;
+            background-color: #fff;
+            border-radius: 6px;
+            border: 2px solid #800000;
+        }
+
+        .stat-box strong {
+            display: block;
+            font-size: 24px;
+            color: #800000;
+            margin-top: 5px;
+        }
+
+        .stat-box span {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .contenedor-permisos {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 15px;
+        }
+
+        .tabla-permisos {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .tabla-permisos thead {
+            background-color: #800000;
+            color: white;
+        }
+
+        .tabla-permisos th {
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .tabla-permisos td {
+            padding: 10px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 13px;
+        }
+
+        .tabla-permisos tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .estado-vigente {
+            color: green;
+            font-weight: bold;
+        }
+
+        .estado-vencido {
+            color: red;
+            font-weight: bold;
+        }
+
+        .btn-descargar {
+            background-color: #800000;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-descargar:hover {
+            background-color: #660000;
+        }
+
+        .mensaje-vacio {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 16px;
+        }
+
+        .botones-acciones {
+            max-width: 600px;
+            margin: 30px auto;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background-color: #800000;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 15px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #660000;
+        }
+
+        footer {
+            margin-top: 40px;
+            width: 100%;
+        }
+
+        footer img {
+            width: 100%;
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .stats {
+                flex-direction: column;
+            }
+
+            .tabla-permisos {
+                font-size: 12px;
+            }
+
+            .tabla-permisos th,
+            .tabla-permisos td {
+                padding: 8px;
+            }
+
+            .tabla-permisos thead {
+                display: none;
+            }
+
+            .tabla-permisos tr {
+                display: block;
+                margin-bottom: 15px;
+                border: 1px solid #e0e0e0;
+                border-radius: 8px;
+                padding: 10px;
+            }
+
+            .tabla-permisos td {
+                display: block;
+                text-align: left;
+                border: none;
+                padding: 5px 0;
+            }
+
+            .tabla-permisos td:before {
+                content: attr(data-label);
+                font-weight: bold;
+                display: inline-block;
+                width: 120px;
+                color: #800000;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <img src="{{ url_for('static', filename='foliox.jpg') }}" alt="Encabezado">
+</header>
+
+<div class="titulo">Mis Permisos Generados</div>
+
+<div class="info-folios">
+    <h3>📊 Estadísticas de Folios</h3>
+    <div class="stats">
+        <div class="stat-box">
+            <span>Total Asignados</span>
+            <strong>{{ folios_asignados }}</strong>
+        </div>
+        <div class="stat-box">
+            <span>Folios Usados</span>
+            <strong>{{ folios_usados }}</strong>
+        </div>
+        <div class="stat-box">
+            <span>Disponibles</span>
+            <strong>{{ folios_asignados - folios_usados }}</strong>
+        </div>
+        <div class="stat-box">
+            <span>Generados</span>
+            <strong>{{ total_generados }}</strong>
+        </div>
+    </div>
+</div>
+
+<div class="contenedor-permisos">
+    {% if permisos %}
+    <table class="tabla-permisos">
+        <thead>
+            <tr>
+                <th>Folio</th>
+                <th>Serie</th>
+                <th>Marca</th>
+                <th>Fecha Expedición</th>
+                <th>Estado</th>
+                <th>Descargar</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in permisos %}
+            <tr>
+                <td data-label="Folio">{{ p.folio }}</td>
+                <td data-label="Serie">{{ p.numero_serie }}</td>
+                <td data-label="Marca">{{ p.marca }}</td>
+                <td data-label="Fecha">{{ p.fecha_formateada }}</td>
+                <td data-label="Estado">
+                    <span class="{% if p.estado == 'VIGENTE' %}estado-vigente{% else %}estado-vencido{% endif %}">
+                        {{ p.estado }}
+                    </span>
+                </td>
+                <td data-label="Descargar">
+                    <a href="{{ url_for('descargar_recibo', folio=p.folio) }}" class="btn-descargar">📥 PDF</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="mensaje-vacio">
+        <p>📋 Aún no has generado ningún permiso.</p>
+        <p>Genera tu primer permiso desde el panel de registro.</p>
+    </div>
+    {% endif %}
+</div>
+
+<div class="botones-acciones">
+    <a href="{{ url_for('registro_usuario') }}" class="btn">🚗 Nuevo Permiso</a>
+    <a href="{{ url_for('consulta_folio') }}" class="btn">🔍 Consultar Folio</a>
+    <a href="{{ url_for('logout') }}" class="btn">🚪 Cerrar Sesión</a>
+</div>
+
+<footer>
+    <img src="{{ url_for('static', filename='pies.jpg') }}" alt="Pie de página">
+</footer>
+
+</body>
+</html>
