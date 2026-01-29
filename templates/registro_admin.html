@@ -29,7 +29,7 @@
       border-radius: 10px;
       background-color: #f9f9f9;
     }
-    input {
+    input, select {
       width: 100%;
       padding: 12px;
       margin: 10px 0;
@@ -37,6 +37,13 @@
       border: 1px solid #ccc;
       font-size: 16px;
       text-transform: uppercase;
+    }
+    label {
+      display: block;
+      font-weight: bold;
+      margin-top: 15px;
+      margin-bottom: 5px;
+      color: #333;
     }
     .btn {
       background-color: #5a5eaa;
@@ -72,6 +79,12 @@
       gap: 10px;
       margin-top: 30px;
     }
+    .nota {
+      font-size: 13px;
+      color: #666;
+      font-style: italic;
+      margin-top: 5px;
+    }
     footer {
       margin-top: 40px;
       width: 100%;
@@ -104,17 +117,20 @@
 {% endwith %}
 
 <form method="POST" class="formulario">
-  <!-- Campos ocultos -->
-  <input type="hidden" name="entidad" value="edomex">
-  <input type="hidden" name="telefono" value="0">
-  <input type="hidden" name="vigencia" value="30">
+  <label for="folio">Folio (opcional):</label>
+  <input type="text" name="folio" id="folio" placeholder="Dejar vacío para generar automático">
+  <p class="nota">💡 Si dejas este campo vacío, se generará automáticamente</p>
 
-  <input type="text" name="folio" id="folio" placeholder="Folio" required>
   <input type="text" name="marca" id="marca" placeholder="Marca" required>
   <input type="text" name="linea" id="linea" placeholder="Línea" required>
   <input type="number" name="anio" id="anio" placeholder="Año" required>
   <input type="text" name="serie" id="serie" placeholder="Número de Serie" required>
   <input type="text" name="motor" id="motor" placeholder="Número de Motor" required>
+  <input type="text" name="color" id="color" placeholder="Color">
+  <input type="text" name="nombre" id="nombre" placeholder="Nombre del Propietario">
+
+  <label for="fecha_inicio">Fecha de inicio de vigencia:</label>
+  <input type="date" name="fecha_inicio" id="fecha_inicio" required>
 
   <button type="submit" class="btn">Registrar Folio</button>
 
@@ -130,17 +146,25 @@
 </footer>
 
 <script>
-  const ids = ["folio", "marca", "linea", "anio", "serie", "motor"];
+  // Establecer fecha de hoy como valor mínimo y por defecto
+  const fechaInput = document.getElementById('fecha_inicio');
+  const hoy = new Date().toISOString().split('T')[0];
+  fechaInput.setAttribute('min', hoy);
+  fechaInput.value = hoy;
+
+  const ids = ["marca", "linea", "anio", "serie", "motor", "color", "nombre"];
   const inputs = {};
 
   ids.forEach((id, index) => {
     const el = document.getElementById(id);
     inputs[id] = el;
 
-    // Forzar texto en mayúsculas
-    el.addEventListener("input", () => {
-      el.value = el.value.toUpperCase();
-    });
+    // Forzar texto en mayúsculas (excepto año)
+    if (id !== "anio") {
+      el.addEventListener("input", () => {
+        el.value = el.value.toUpperCase();
+      });
+    }
 
     // Saltar al siguiente campo automáticamente al pegar
     el.addEventListener("paste", () => {
