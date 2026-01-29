@@ -46,6 +46,15 @@
             border-radius: 6px;
             border: 1px solid #ccc;
             font-size: 16px;
+            text-transform: uppercase;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            color: #333;
         }
 
         .btn {
@@ -90,6 +99,7 @@
             justify-content: center;
             gap: 10px;
             margin-top: 20px;
+            flex-wrap: wrap;
         }
 
         .botones-acciones a {
@@ -148,24 +158,22 @@
 {% endwith %}
 
 <form method="POST" class="formulario">
-    <input type="text" name="folio" placeholder="Folio" required>
     <input type="text" name="marca" placeholder="Marca" required>
     <input type="text" name="linea" placeholder="Línea" required>
     <input type="number" name="anio" placeholder="Año" required>
     <input type="text" name="serie" placeholder="Número de Serie" required>
     <input type="text" name="motor" placeholder="Número de Motor" required>
+    <input type="text" name="color" placeholder="Color">
+    <input type="text" name="nombre" placeholder="Nombre del Propietario">
 
-    <select name="vigencia" required>
-        <option value="">Selecciona vigencia</option>
-        <option value="30">30 días</option>
-        <option value="60">60 días</option>
-        <option value="90">90 días</option>
-    </select>
+    <label for="fecha_inicio">Fecha de inicio de vigencia:</label>
+    <input type="date" name="fecha_inicio" id="fecha_inicio" required>
 
     <button type="submit" class="btn">Registrar Folio</button>
 </form>
 
 <div class="botones-acciones">
+    <a href="{{ url_for('mis_permisos') }}">Mis Permisos</a>
     <a href="{{ url_for('consulta_folio') }}">Consultar Folio</a>
     <a href="{{ url_for('logout') }}">Cerrar Sesión</a>
 </div>
@@ -173,6 +181,14 @@
 <footer>
     <img src="{{ url_for('static', filename='pies.jpg') }}" alt="Pie de página">
 </footer>
+
+<script>
+  // Establecer fecha de hoy como valor mínimo
+  const fechaInput = document.getElementById('fecha_inicio');
+  const hoy = new Date().toISOString().split('T')[0];
+  fechaInput.setAttribute('min', hoy);
+  fechaInput.value = hoy;
+</script>
 
 </body>
 </html>
