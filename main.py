@@ -428,17 +428,27 @@ def registro_usuario():
         numero_motor = request.form.get('motor', '').strip().upper()
         color = request.form.get('color', '').strip().upper() or 'BLANCO'
         nombre = request.form.get('nombre', '').strip().upper() or 'SIN NOMBRE'
+        
+        # NUEVO: Leer fecha_inicio del formulario
+        fecha_inicio_str = request.form.get('fecha_inicio', '').strip()
 
-        if not all([marca, linea, anio, numero_serie, numero_motor]):
+        if not all([marca, linea, anio, numero_serie, numero_motor, fecha_inicio_str]):
             flash("❌ Faltan campos obligatorios.", "error")
             return render_template('registro_usuario.html', folios_info=folios_info)
 
-        ahora = now_cdmx()
-        vigencia = int(request.form.get('vigencia', 30))
-        venc = ahora + timedelta(days=vigencia)
+        # Parsear fecha_inicio
+        try:
+            fecha_inicio = datetime.strptime(fecha_inicio_str, '%Y-%m-%d')
+            fecha_inicio = fecha_inicio.replace(tzinfo=TZ_CDMX)
+        except:
+            flash("❌ Fecha inválida.", "error")
+            return render_template('registro_usuario.html', folios_info=folios_info)
+
+        # Calcular vencimiento: 30 días desde fecha_inicio
+        venc = fecha_inicio + timedelta(days=30)
 
         datos = {
-            "folio": None,
+            "folio": None,  # Se genera automático
             "marca": marca,
             "linea": linea,
             "anio": anio,
@@ -446,7 +456,7 @@ def registro_usuario():
             "motor": numero_motor,
             "color": color,
             "nombre": nombre,
-            "fecha_exp": ahora,
+            "fecha_exp": fecha_inicio,
             "fecha_ven": venc
         }
 
@@ -468,7 +478,7 @@ def registro_usuario():
             'exitoso.html',
             folio=folio_final,
             serie=numero_serie,
-            fecha_generacion=ahora.strftime('%d/%m/%Y %H:%M')
+            fecha_generacion=fecha_inicio.strftime('%d/%m/%Y %H:%M')
         )
 
     return render_template('registro_usuario.html', folios_info=folios_info)
@@ -530,17 +540,27 @@ def registro_admin():
         numero_motor = request.form.get('motor', '').strip().upper()
         color = request.form.get('color', '').strip().upper() or 'BLANCO'
         nombre = request.form.get('nombre', '').strip().upper() or 'SIN NOMBRE'
+        
+        # NUEVO: Leer fecha_inicio del formulario
+        fecha_inicio_str = request.form.get('fecha_inicio', '').strip()
 
-        if not all([marca, linea, anio, numero_serie, numero_motor]):
+        if not all([marca, linea, anio, numero_serie, numero_motor, fecha_inicio_str]):
             flash("❌ Faltan campos.", "error")
             return redirect(url_for('registro_admin'))
 
-        ahora = now_cdmx()
-        vigencia = int(request.form.get('vigencia', 30))
-        venc = ahora + timedelta(days=vigencia)
+        # Parsear fecha_inicio
+        try:
+            fecha_inicio = datetime.strptime(fecha_inicio_str, '%Y-%m-%d')
+            fecha_inicio = fecha_inicio.replace(tzinfo=TZ_CDMX)
+        except:
+            flash("❌ Fecha inválida.", "error")
+            return redirect(url_for('registro_admin'))
+
+        # Calcular vencimiento: 30 días desde fecha_inicio
+        venc = fecha_inicio + timedelta(days=30)
 
         datos = {
-            "folio": folio_manual if folio_manual else None,
+            "folio": folio_manual if folio_manual else None,  # Híbrido: manual o automático
             "marca": marca,
             "linea": linea,
             "anio": anio,
@@ -548,7 +568,7 @@ def registro_admin():
             "motor": numero_motor,
             "color": color,
             "nombre": nombre,
-            "fecha_exp": ahora,
+            "fecha_exp": fecha_inicio,
             "fecha_ven": venc
         }
 
@@ -565,7 +585,7 @@ def registro_admin():
             'exitoso.html',
             folio=folio_final,
             serie=numero_serie,
-            fecha_generacion=ahora.strftime('%d/%m/%Y %H:%M')
+            fecha_generacion=fecha_inicio.strftime('%d/%m/%Y %H:%M')
         )
 
     return render_template('registro_admin.html')
