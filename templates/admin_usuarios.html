@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Usuarios</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { background-color: #ffffff; font-family: Arial, sans-serif; margin: 0; padding: 0; color: #000; }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 10px 30px; }
+        header img { height: 80px; }
+        .titulo { text-align: center; font-size: 26px; font-weight: bold; margin: 20px 0 10px; }
+        .flash-container { max-width: 95%; margin: 10px auto; }
+        .flash.success { background: #d4edda; color: #155724; padding: 8px; border-radius: 4px; margin-bottom: 10px; }
+        .flash.warning { background: #fff3cd; color: #856404; padding: 8px; border-radius: 4px; margin-bottom: 10px; }
+        .flash.error { background: #f8d7da; color: #721c24; padding: 8px; border-radius: 4px; margin-bottom: 10px; }
+
+        .contenedor { max-width: 95%; margin: 0 auto 40px; }
+
+        .tarjeta {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 14px;
+            background: #f9f9f9;
+        }
+        .nombre-usuario { font-size: 16px; font-weight: bold; color: #800000; }
+        .detalle { font-size: 13px; color: #444; margin-top: 6px; line-height: 1.8; }
+
+        /* Barra de folios */
+        .barra-wrap { background: #e0e0e0; border-radius: 8px; height: 12px; margin-top: 5px; overflow: hidden; }
+        .barra-fill { height: 100%; border-radius: 8px; }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            border-radius: 5px;
+            padding: 3px 10px;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+        }
+        .badge-pagado    { background: #28a745; }
+        .badge-pendiente { background: #e67e22; }
+        .badge-vencido   { background: #c0392b; }
+
+        /* Botones acción */
+        .btn-accion {
+            width: 100%;
+            padding: 10px 0;
+            font-size: 14px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+            color: white;
+            font-weight: bold;
+        }
+        .btn-pagar    { background-color: #28a745; }
+        .btn-pagar:hover { background-color: #1e7e34; }
+        .btn-revertir { background-color: #e67e22; }
+        .btn-revertir:hover { background-color: #ca6f1e; }
+
+        .volver { text-align: center; margin: 20px 0; }
+        .volver a {
+            background-color: #800000;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 15px;
+        }
+        .volver a:hover { background-color: #a00000; }
+
+        footer { width: 100%; }
+        footer img { width: 100%; display: block; }
+
+        @media (max-width: 600px) {
+            header img { height: 60px; }
+            .titulo { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+    <img src="{{ url_for('static', filename='sub_logo.png') }}" alt="Sub Logo">
+</header>
+
+<div class="titulo">👥 Gestión de Usuarios y Pagos</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-container">
+        {% for category, msg in messages %}
+        <div class="flash {{ category }}">{{ msg }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+{% endwith %}
+
+<div class="contenedor">
+    {% for u in usuarios %}
+    {% set asig   = u.folios_asignac | default(0) | int %}
+    {% set usados = u.folios_usados  | default(0) | int %}
+    {% set pct    = ((usados / asig) * 100) | round | int if asig > 0 else 0 %}
+    {% set color  = '#c0392b' if pct >= 80 else ('#e67e22' if pct >= 50 else '#28a745') %}
+
+    <div class="tarjeta">
+        <div class="nombre-usuario">{{ u.username }}</div>
+        <div class="detalle">
+            <b>Folios:</b> {{ usados }} / {{ asig }} ({{ pct }}%)
+            <div class="barra-wrap">
+                <div class="barra-fill" style="width:{{ pct }}%; background:{{ color }};"></div>
+            </div>
+            <br>
+            <b>Estado de pago:</b>
+            {% if u.pagado %}
+                <span class="badge badge-pagado">✅ PAGADO</span>
+            {% elif u.timer_info and u.timer_info.vencido %}
+                <span class="badge badge-vencido">⛔ TIEMPO VENCIDO</span>
+            {% else %}
+                <span class="badge badge-pendiente">⚠️ PENDIENTE</span>
+                {% if u.timer_info %}
+                    {% set seg = u.timer_info.segundos_restantes %}
+                    — {{ (seg // 3600) }}h {{ ((seg % 3600) // 60) }}m restantes
+                {% endif %}
+            {% endif %}
+        </div>
+
+        {% if not u.pagado %}
+        <form method="POST" action="{{ url_for('marcar_pagado', user_id=u.id) }}">
+            <button type="submit" class="btn-accion btn-pagar">✅ Marcar como PAGADO</button>
+        </form>
+        {% else %}
+        <form method="POST" action="{{ url_for('marcar_pendiente', user_id=u.id) }}">
+            <button type="submit" class="btn-accion btn-revertir">↩️ Revertir a PENDIENTE</button>
+        </form>
+        {% endif %}
+    </div>
+    {% endfor %}
+
+    {% if not usuarios %}
+    <p style="text-align:center; color:#888;">No hay usuarios registrados.</p>
+    {% endif %}
+</div>
+
+<div class="volver">
+    <a href="{{ url_for('admin') }}">← Volver al Panel</a>
+</div>
+
+<footer>
+    <img src="{{ url_for('static', filename='footer.png') }}" alt="Footer">
+</footer>
+
+</body>
+</html>
