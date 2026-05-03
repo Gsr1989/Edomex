@@ -56,6 +56,24 @@
             background-color: #660000;
         }
 
+        /* Botón exclusivo para gestión de usuarios — morado */
+        .btn-usuarios {
+            background-color: #6a1b9a;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            font-size: 15px;
+            cursor: pointer;
+            text-align: center;
+            transition: background-color 0.3s ease;
+            min-width: 150px;
+        }
+
+        .btn-usuarios:hover {
+            background-color: #4a148c;
+        }
+
         footer {
             margin-top: 30px;
             width: 100%;
@@ -67,7 +85,7 @@
         }
 
         @media (max-width: 600px) {
-            .btn {
+            .btn, .btn-usuarios {
                 min-width: 120px;
                 font-size: 14px;
                 padding: 7px 14px;
@@ -89,6 +107,7 @@
         <a href="{{ url_for('consulta_folio') }}"><button class="btn">Consultar Folio</button></a>
         <a href="{{ url_for('crear_usuario') }}"><button class="btn">Crear Usuario</button></a>
         <a href="{{ url_for('admin_folios') }}"><button class="btn">Ver Folios Registrados</button></a>
+        <a href="{{ url_for('admin_usuarios') }}"><button class="btn-usuarios">👥 Gestión de Usuarios y Pagos</button></a>
     {% elif session.get('rol') == 'distribuidor' %}
         <a href="{{ url_for('crear_cliente') }}"><button class="btn">Crear Cliente</button></a>
         <a href="{{ url_for('crear_usuario_hijo') }}"><button class="btn">Crear Subusuario</button></a>
@@ -104,4 +123,4 @@
 </footer>
 
 </body>
-</html>
+                                                      </html>
