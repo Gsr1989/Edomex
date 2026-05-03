@@ -30,6 +30,42 @@
         .volver a:hover { background-color: #a00000; }
         footer { width: 100%; }
         footer img { width: 100%; display: block; }
+
+        /* ── BUSCADOR ── */
+        .buscador-wrap {
+            max-width: 95%;
+            margin: 0 auto 16px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .buscador-wrap input {
+            flex: 1;
+            padding: 10px 14px;
+            font-size: 15px;
+            border: 2px solid #800000;
+            border-radius: 8px;
+            outline: none;
+        }
+        .buscador-wrap input:focus {
+            border-color: #a00000;
+            box-shadow: 0 0 4px rgba(128,0,0,0.3);
+        }
+        .contador {
+            max-width: 95%;
+            margin: 0 auto 8px;
+            font-size: 13px;
+            color: #555;
+        }
+        tr.oculta { display: none; }
+
+        /* resaltado de coincidencia */
+        mark {
+            background: #ffe066;
+            border-radius: 3px;
+            padding: 0 2px;
+        }
+
         @media (max-width: 600px) {
             header img { height: 60px; }
             .titulo { font-size: 22px; }
@@ -56,8 +92,16 @@
     {% endif %}
 {% endwith %}
 
+<!-- ── BUSCADOR ── -->
+<div class="buscador-wrap">
+    <input type="text" id="buscador"
+           placeholder="🔍 Buscar por folio, serie, marca, línea, año, motor, color, nombre..."
+           oninput="filtrar()">
+</div>
+<div class="contador" id="contador"></div>
+
 <div class="tabla-container">
-    <table>
+    <table id="tabla-folios">
         <thead>
             <tr>
                 <th>Folio</th>
@@ -66,6 +110,8 @@
                 <th>Año</th>
                 <th>Serie</th>
                 <th>Motor</th>
+                <th>Color</th>
+                <th>Nombre</th>
                 <th>Entidad</th>
                 <th>Expedición</th>
                 <th>Vencimiento</th>
@@ -73,7 +119,7 @@
                 <th>Acciones</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="cuerpo-tabla">
         {% for f in folios %}
             <tr>
                 <td>{{ f.folio }}</td>
@@ -82,6 +128,8 @@
                 <td>{{ f.anio }}</td>
                 <td>{{ f.numero_serie }}</td>
                 <td>{{ f.numero_motor }}</td>
+                <td>{{ f.color or '—' }}</td>
+                <td>{{ f.nombre or '—' }}</td>
                 <td>{{ f.entidad }}</td>
                 <td>{{ f.fecha_expedicion[:10] }}</td>
                 <td>{{ f.fecha_vencimiento[:10] }}</td>
@@ -94,13 +142,11 @@
                     <a href="{{ url_for('editar_folio', folio=f.folio) }}">
                         <button class="btn btn-editar">Editar</button>
                     </a>
-
                     <form method="POST" action="{{ url_for('eliminar_folio') }}" style="display:inline;"
                           onsubmit="return confirm('¿Eliminar folio {{ f.folio }}?');">
                         <input type="hidden" name="folio" value="{{ f.folio }}">
                         <button type="submit" class="btn btn-eliminar">Eliminar</button>
                     </form>
-
                     <a href="{{ url_for('descargar_recibo', folio=f.folio) }}" target="_blank">
                         <button class="btn btn-descargar">PDF</button>
                     </a>
@@ -118,6 +164,68 @@
 <footer>
     <img src="{{ url_for('static', filename='footer.png') }}" alt="Footer">
 </footer>
+
+<script>
+// Columnas que se buscan (índices 0-7: folio,marca,linea,anio,serie,motor,color,nombre)
+const COLS_BUSQUEDA = [0, 1, 2, 3, 4, 5, 6, 7];
+
+function filtrar() {
+    const query   = document.getElementById('buscador').value.trim().toUpperCase();
+    const filas   = document.querySelectorAll('#cuerpo-tabla tr');
+    let visibles  = 0;
+
+    filas.forEach(fila => {
+        const celdas = fila.querySelectorAll('td');
+        let coincide = false;
+
+        if (query === '') {
+            coincide = true;
+        } else {
+            COLS_BUSQUEDA.forEach(idx => {
+                if (celdas[idx] && celdas[idx].textContent.toUpperCase().includes(query)) {
+                    coincide = true;
+                }
+            });
+        }
+
+        if (coincide) {
+            fila.classList.remove('oculta');
+            visibles++;
+
+            // Resaltar coincidencias en celdas buscables
+            COLS_BUSQUEDA.forEach(idx => {
+                if (!celdas[idx]) return;
+                const texto   = celdas[idx].textContent;
+                if (query && texto.toUpperCase().includes(query)) {
+                    const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi');
+                    celdas[idx].innerHTML = texto.replace(regex, '<mark>$1</mark>');
+                } else {
+                    celdas[idx].textContent = texto.replace(/<[^>]*>/g, '');
+                }
+            });
+
+        } else {
+            fila.classList.add('oculta');
+            // Limpiar resaltado en filas ocultas
+            COLS_BUSQUEDA.forEach(idx => {
+                if (celdas[idx]) celdas[idx].textContent = celdas[idx].textContent;
+            });
+        }
+    });
+
+    // Contador
+    const total = filas.length;
+    const cont  = document.getElementById('contador');
+    if (query === '') {
+        cont.textContent = `Total: ${total} folios`;
+    } else {
+        cont.textContent = `${visibles} coincidencia${visibles !== 1 ? 's' : ''} de ${total}`;
+    }
+}
+
+// Mostrar total al cargar
+filtrar();
+</script>
 
 </body>
 </html>
