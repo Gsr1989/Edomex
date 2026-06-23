@@ -36,17 +36,9 @@
             color: white;
         }
 
-        .verde {
-            background-color: #28a745;
-        }
-
-        .vencido {
-            background-color: #b38b00;
-        }
-
-        .no-encontrado {
-            background-color: #a00000;
-        }
+        .verde         { background-color: #28a745; }
+        .vencido       { background-color: #b38b00; }
+        .no-encontrado { background-color: #a00000; }
 
         .certificado {
             border: 2px solid #ccc;
@@ -58,14 +50,8 @@
             font-size: 15px;
         }
 
-        .dato {
-            margin: 10px 0;
-        }
-
-        .dato strong {
-            display: block;
-            font-weight: bold;
-        }
+        .dato { margin: 10px 0; }
+        .dato strong { display: block; font-weight: bold; }
 
         .valido {
             text-align: center;
@@ -82,7 +68,7 @@
         }
 
         .btn-regresar a {
-            background-color: #A02232;  /* ROJO MÁS CLARO (tipo encabezado) */
+            background-color: #A02232;
             color: white;
             text-decoration: none;
             padding: 10px 18px;
@@ -92,17 +78,49 @@
             transition: background-color 0.3s ease;
         }
 
-        .btn-regresar a:hover {
-            background-color: #801a28;  /* Más oscuro al pasar el mouse */
+        .btn-regresar a:hover { background-color: #801a28; }
+
+        .renovar-container {
+            width: 85%;
+            margin: 10px auto 20px auto;
+            text-align: center;
+        }
+
+        .btn-renovar {
+            display: inline-block;
+            padding: 13px 32px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            background-color: #b38b00;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .btn-renovar:hover    { background-color: #d4a800; }
+        .btn-renovar:disabled { background-color: #888; cursor: not-allowed; }
+
+        .aviso-pendiente {
+            width: 85%;
+            margin: 10px auto 20px auto;
+            padding: 14px 18px;
+            border-radius: 10px;
+            background-color: #fff3cd;
+            border: 2px solid #e0a800;
+            color: #7a5a00;
+            font-size: 14px;
+            text-align: center;
+            font-weight: bold;
+            line-height: 1.6;
         }
 
         @media (max-width: 600px) {
-            .texto-superior {
-                font-size: 15px;
-            }
-            .estado {
-                font-size: 16px;
-            }
+            .texto-superior { font-size: 15px; }
+            .estado         { font-size: 16px; }
         }
     </style>
 </head>
@@ -114,7 +132,7 @@
 
     <div class="texto-superior">RESULTADO DE CONSULTA:</div>
 
-    {% if resultado.estado == "No encontrado" %}
+    {% if resultado.estado == "No encontrado" or resultado.estado == "NO REGISTRADO" %}
         <div class="estado no-encontrado">
             FOLIO {{ resultado.folio }} : NO SE ENCUENTRA REGISTRADO
         </div>
@@ -128,7 +146,7 @@
         </div>
     {% endif %}
 
-    {% if resultado.estado != "No encontrado" %}
+    {% if resultado.estado not in ["No encontrado", "NO REGISTRADO"] %}
     <div class="certificado">
         <div class="dato"><strong>Fecha de Expedición:</strong>{{ resultado.fecha_expedicion }}</div>
         <div class="dato"><strong>Fecha de Vencimiento:</strong>{{ resultado.fecha_vencimiento }}</div>
@@ -138,6 +156,73 @@
         <div class="dato"><strong>Número de Serie:</strong>{{ resultado.numero_serie }}</div>
         <div class="dato"><strong>Número de Motor:</strong>{{ resultado.numero_motor }}</div>
     </div>
+    {% endif %}
+
+    {% if resultado.ya_renovado %}
+    <div class="aviso-pendiente">
+        ⚠️ Ya tienes una renovación en proceso.<br>
+        Envía tu comprobante de pago para activarla.<br>
+        Si no realizas el pago a tiempo, el folio se cancelará automáticamente.
+    </div>
+
+    {% elif resultado.puede_renovar %}
+    <div class="renovar-container">
+        <button id="btnRenovar" class="btn-renovar"
+                onclick="confirmarRenovacion('{{ resultado.folio_actual }}')">
+            🔄 Renovar tu permiso
+        </button>
+    </div>
+
+    <script>
+    function confirmarRenovacion(folio) {
+        const ok = confirm(
+            "Estás a punto de renovar tu permiso del Estado de México.\n\n" +
+            "⚠️ Tienes solo 2 horas para realizar tu pago, " +
+            "de lo contrario el folio se eliminará automáticamente.\n\n" +
+            "¿Deseas continuar?"
+        );
+        if (!ok) return;
+
+        const btn = document.getElementById('btnRenovar');
+        btn.disabled = true;
+        btn.textContent = "Generando tu permiso...";
+
+        fetch(`/renovar_folio/${folio}`, { method: 'POST' })
+            .then(r => r.json())
+            .then(data => {
+                if (!data.ok) {
+                    alert("⚠️ " + data.error);
+                    btn.disabled = false;
+                    btn.textContent = "🔄 Renovar tu permiso";
+                    return;
+                }
+
+                btn.textContent = "Preparando tu PDF...";
+                let intentos = 0;
+
+                const checarPdf = setInterval(() => {
+                    intentos++;
+                    fetch(`/estado_pdf/${data.folio_nuevo}`)
+                        .then(r => r.json())
+                        .then(estado => {
+                            if (estado.pdf_url) {
+                                clearInterval(checarPdf);
+                                window.location.href = estado.pdf_url;
+                            } else if (intentos >= 15) {
+                                clearInterval(checarPdf);
+                                window.location.href = `/consulta/${data.folio_nuevo}`;
+                            }
+                        })
+                        .catch(() => {});
+                }, 2000);
+            })
+            .catch(() => {
+                alert("Error de conexión, intenta de nuevo.");
+                btn.disabled = false;
+                btn.textContent = "🔄 Renovar tu permiso";
+            });
+    }
+    </script>
     {% endif %}
 
     <div class="valido">DOCUMENTO DIGITAL VÁLIDO EN TODO MÉXICO</div>
