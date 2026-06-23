@@ -2,230 +2,245 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Administrar Folios</title>
+    <title>Folios Edomex — Admin</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-        body { background-color: #ffffff; font-family: Arial, sans-serif; margin: 0; padding: 0; color: #000; }
-        header { display: flex; justify-content: space-between; align-items: center; padding: 10px 30px; }
-        header img { height: 80px; }
-        .titulo { text-align: center; font-size: 26px; font-weight: bold; margin: 20px 0 10px; }
-        .flash-container { max-width: 95%; margin: 10px auto; }
-        .flash.success { background: #d4edda; color: #155724; padding: 8px; border-radius: 4px; margin-bottom: 10px; }
-        .flash.error { background: #f8d7da; color: #721c24; padding: 8px; border-radius: 4px; margin-bottom: 10px; }
-        .tabla-container { max-width: 95%; margin: auto; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 40px; }
-        th, td { padding: 12px; border: 1px solid #ccc; text-align: center; font-size: 14px; text-transform: uppercase; }
-        th { background-color: #800000; color: white; }
-        .estado-verde { color: green; font-weight: bold; }
-        .estado-rojo { color: red; font-weight: bold; }
-        .btn { padding: 6px 10px; font-size: 13px; border: none; border-radius: 5px; cursor: pointer; margin: 2px 0; }
-        .btn-editar { background-color: #2a72a5; color: white; }
-        .btn-editar:hover { background-color: #1e5b88; }
-        .btn-eliminar { background-color: #a00000; color: white; }
-        .btn-eliminar:hover { background-color: #800000; }
-        .btn-descargar { background-color: #228B22; color: white; }
-        .btn-descargar:hover { background-color: #1c6e1c; }
-        .volver { text-align: center; margin: 20px 0; }
-        .volver a { background-color: #800000; color: white; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-size: 15px; }
-        .volver a:hover { background-color: #a00000; }
-        footer { width: 100%; }
-        footer img { width: 100%; display: block; }
+        * { box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 15px; }
+        h1 { text-align: center; color: #333; margin-bottom: 15px; }
 
-        /* ── BUSCADOR ── */
-        .buscador-wrap {
-            max-width: 95%;
-            margin: 0 auto 16px;
-            display: flex;
-            gap: 10px;
-            align-items: center;
+        .flash-msg {
+            padding: 12px 16px; border-radius: 8px; margin-bottom: 15px;
+            font-weight: bold;
         }
-        .buscador-wrap input {
-            flex: 1;
-            padding: 10px 14px;
-            font-size: 15px;
-            border: 2px solid #800000;
-            border-radius: 8px;
-            outline: none;
+        .flash-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .flash-error   { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+        /* ── FILTROS ── */
+        .filtros {
+            background: white; border-radius: 10px; padding: 15px;
+            margin-bottom: 15px; box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end;
         }
-        .buscador-wrap input:focus {
-            border-color: #a00000;
-            box-shadow: 0 0 4px rgba(128,0,0,0.3);
+        .filtros label { font-size: 12px; font-weight: bold; color: #555; display: block; margin-bottom: 3px; }
+        .filtros input, .filtros select {
+            padding: 8px 10px; border: 1px solid #ccc; border-radius: 6px;
+            font-size: 14px; width: 100%;
         }
+        .filtros .f-group { flex: 1; min-width: 140px; }
+        .btn-filtrar {
+            padding: 9px 20px; background: #A02232; color: white;
+            border: none; border-radius: 6px; font-weight: bold;
+            cursor: pointer; font-size: 14px; align-self: flex-end;
+        }
+        .btn-filtrar:hover { background: #801a28; }
+        .btn-limpiar {
+            padding: 9px 14px; background: #6c757d; color: white;
+            border: none; border-radius: 6px; font-size: 14px;
+            cursor: pointer; align-self: flex-end; text-decoration: none;
+            display: inline-block;
+        }
+
+        /* ── CONTADOR ── */
         .contador {
-            max-width: 95%;
-            margin: 0 auto 8px;
-            font-size: 13px;
-            color: #555;
+            text-align: right; font-size: 13px; color: #666;
+            margin-bottom: 10px; padding-right: 4px;
         }
-        tr.oculta { display: none; }
 
-        /* resaltado de coincidencia */
-        mark {
-            background: #ffe066;
-            border-radius: 3px;
-            padding: 0 2px;
+        /* ── TABLA ── */
+        .tabla-wrap { overflow-x: auto; }
+        table {
+            width: 100%; border-collapse: collapse; background: white;
+            border-radius: 10px; overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            font-size: 13px;
         }
+        th {
+            background: #A02232; color: white; padding: 10px 8px;
+            text-align: left; white-space: nowrap;
+        }
+        td { padding: 9px 8px; border-bottom: 1px solid #eee; vertical-align: middle; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #fef9f9; }
+
+        /* ── BADGES ── */
+        .badge {
+            display: inline-block; padding: 3px 9px; border-radius: 20px;
+            font-size: 11px; font-weight: bold; color: white; white-space: nowrap;
+        }
+        .badge-vigente   { background: #28a745; }
+        .badge-vencido   { background: #b38b00; }
+        .badge-pendiente { background: #dc3545; }
+        .badge-validado  { background: #17a2b8; }
+        .badge-lote      { background: #6c757d; }
+
+        /* ── ACCIONES ── */
+        .btn-accion {
+            padding: 5px 10px; border: none; border-radius: 5px;
+            font-size: 12px; font-weight: bold; cursor: pointer;
+            color: white; white-space: nowrap;
+        }
+        .btn-validar  { background: #28a745; }
+        .btn-validar:hover { background: #1e7e34; }
+        .btn-editar   { background: #007bff; }
+        .btn-editar:hover { background: #0056b3; }
+        .btn-eliminar { background: #dc3545; }
+        .btn-eliminar:hover { background: #a71d2a; }
+        .btn-ver      { background: #6c757d; }
+        .btn-ver:hover { background: #495057; }
+
+        .acciones-td { display: flex; gap: 5px; flex-wrap: wrap; }
+
+        .back-link { text-align: center; margin-top: 20px; }
+        .back-link a { color: #A02232; font-weight: bold; text-decoration: none; }
 
         @media (max-width: 600px) {
-            header img { height: 60px; }
-            .titulo { font-size: 22px; }
-            th, td { font-size: 12px; }
+            th, td { font-size: 11px; padding: 6px 5px; }
         }
     </style>
 </head>
 <body>
 
-<header>
-    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
-    <img src="{{ url_for('static', filename='sub_logo.png') }}" alt="Sub Logo">
-</header>
-
-<div class="titulo">Administración de Folios Registrados</div>
+<h1>📋 Folios Edomex</h1>
 
 {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-    <div class="flash-container">
-        {% for category, msg in messages %}
-        <div class="flash {{ category }}">{{ msg }}</div>
-        {% endfor %}
-    </div>
-    {% endif %}
+  {% for cat, msg in messages %}
+    <div class="flash-msg flash-{{ cat }}">{{ msg }}</div>
+  {% endfor %}
 {% endwith %}
 
-<!-- ── BUSCADOR ── -->
-<div class="buscador-wrap">
-    <input type="text" id="buscador"
-           placeholder="🔍 Buscar por folio, serie, marca, línea, año, motor, color, nombre..."
-           oninput="filtrar()">
-</div>
-<div class="contador" id="contador"></div>
+<!-- FILTROS -->
+<form method="GET" action="{{ url_for('admin_folios') }}">
+    <div class="filtros">
+        <div class="f-group">
+            <label>Buscar</label>
+            <input type="text" name="filtro" value="{{ filtro }}" placeholder="Folio o serie...">
+        </div>
+        <div class="f-group">
+            <label>Criterio</label>
+            <select name="criterio">
+                <option value="folio"        {{ 'selected' if criterio=='folio' }}>Folio</option>
+                <option value="numero_serie" {{ 'selected' if criterio=='numero_serie' }}>No. Serie</option>
+            </select>
+        </div>
+        <div class="f-group">
+            <label>Estado</label>
+            <select name="estado">
+                <option value="todos"   {{ 'selected' if estado=='todos' }}>Todos</option>
+                <option value="vigente" {{ 'selected' if estado=='vigente' }}>Vigente</option>
+                <option value="vencido" {{ 'selected' if estado=='vencido' }}>Vencido</option>
+            </select>
+        </div>
+        <div class="f-group">
+            <label>Pago</label>
+            <select name="estado_pago">
+                <option value="todos"          {{ 'selected' if estado_pago=='todos' }}>Todos</option>
+                <option value="PENDIENTE_PAGO" {{ 'selected' if estado_pago=='PENDIENTE_PAGO' }}>Pendiente</option>
+                <option value="VALIDADO"       {{ 'selected' if estado_pago=='VALIDADO' }}>Validado</option>
+            </select>
+        </div>
+        <div class="f-group">
+            <label>Desde</label>
+            <input type="date" name="fecha_inicio" value="{{ fecha_inicio }}">
+        </div>
+        <div class="f-group">
+            <label>Hasta</label>
+            <input type="date" name="fecha_fin" value="{{ fecha_fin }}">
+        </div>
+        <button type="submit" class="btn-filtrar">🔍 Filtrar</button>
+        <a href="{{ url_for('admin_folios') }}" class="btn-limpiar">✖ Limpiar</a>
+    </div>
+</form>
 
-<div class="tabla-container">
-    <table id="tabla-folios">
-        <thead>
-            <tr>
-                <th>Folio</th>
-                <th>Marca</th>
-                <th>Línea</th>
-                <th>Año</th>
-                <th>Serie</th>
-                <th>Motor</th>
-                <th>Color</th>
-                <th>Nombre</th>
-                <th>Entidad</th>
-                <th>Expedición</th>
-                <th>Vencimiento</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody id="cuerpo-tabla">
-        {% for f in folios %}
-            <tr>
-                <td>{{ f.folio }}</td>
-                <td>{{ f.marca }}</td>
-                <td>{{ f.linea }}</td>
-                <td>{{ f.anio }}</td>
-                <td>{{ f.numero_serie }}</td>
-                <td>{{ f.numero_motor }}</td>
-                <td>{{ f.color or '—' }}</td>
-                <td>{{ f.nombre or '—' }}</td>
-                <td>{{ f.entidad }}</td>
-                <td>{{ f.fecha_expedicion[:10] }}</td>
-                <td>{{ f.fecha_vencimiento[:10] }}</td>
-                <td>
-                    <span class="{% if f.estado == 'VIGENTE' %}estado-verde{% else %}estado-rojo{% endif %}">
-                        {{ f.estado }}
-                    </span>
-                </td>
-                <td>
-                    <a href="{{ url_for('editar_folio', folio=f.folio) }}">
-                        <button class="btn btn-editar">Editar</button>
-                    </a>
-                    <form method="POST" action="{{ url_for('eliminar_folio') }}" style="display:inline;"
-                          onsubmit="return confirm('¿Eliminar folio {{ f.folio }}?');">
-                        <input type="hidden" name="folio" value="{{ f.folio }}">
-                        <button type="submit" class="btn btn-eliminar">Eliminar</button>
-                    </form>
-                    <a href="{{ url_for('descargar_recibo', folio=f.folio) }}" target="_blank">
-                        <button class="btn btn-descargar">PDF</button>
-                    </a>
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+<div class="contador">
+    Total: <strong>{{ folios|length }}</strong> folio(s)
+    {% set pendientes = folios | selectattr('estado_pago', 'equalto', 'PENDIENTE_PAGO') | list %}
+    {% if pendientes %}
+        — <span style="color:#dc3545; font-weight:bold;">⚠️ {{ pendientes|length }} pendiente(s) de pago</span>
+    {% endif %}
 </div>
 
-<div class="volver">
-    <a href="{{ url_for('admin') }}">Volver al Panel</a>
+<div class="tabla-wrap">
+<table>
+    <thead>
+        <tr>
+            <th>Folio</th>
+            <th>Marca / Línea</th>
+            <th>Año</th>
+            <th>Serie</th>
+            <th>Expedición</th>
+            <th>Vencimiento</th>
+            <th>Estado</th>
+            <th>Pago</th>
+            <th>Origen</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for f in folios %}
+    <tr>
+        <td><strong>{{ f.folio }}</strong></td>
+        <td>{{ f.marca }} {{ f.linea }}</td>
+        <td>{{ f.anio }}</td>
+        <td style="font-size:11px;">{{ f.numero_serie }}</td>
+        <td>{{ f.fecha_expedicion }}</td>
+        <td>{{ f.fecha_vencimiento }}</td>
+        <td>
+            {% if f.estado == "VIGENTE" %}
+                <span class="badge badge-vigente">VIGENTE</span>
+            {% else %}
+                <span class="badge badge-vencido">VENCIDO</span>
+            {% endif %}
+        </td>
+        <td>
+            {% if f.estado_pago == "PENDIENTE_PAGO" %}
+                <span class="badge badge-pendiente">PENDIENTE</span>
+            {% else %}
+                <span class="badge badge-validado">VALIDADO</span>
+            {% endif %}
+        </td>
+        <td style="font-size:11px;">{{ f.folio_origen or "—" }}</td>
+        <td>
+            <div class="acciones-td">
+                {# Botón validar pago — solo si está pendiente #}
+                {% if f.estado_pago == "PENDIENTE_PAGO" %}
+                <form method="POST" action="{{ url_for('validar_pago', folio=f.folio) }}"
+                      onsubmit="return confirm('¿Validar pago del folio {{ f.folio }}?')">
+                    <button type="submit" class="btn-accion btn-validar">✅ Validar</button>
+                </form>
+                {% endif %}
+
+                <a href="{{ url_for('consulta_folio_directo', folio=f.folio) }}"
+                   target="_blank">
+                    <button type="button" class="btn-accion btn-ver">🔗 Ver</button>
+                </a>
+
+                <a href="{{ url_for('editar_folio', folio=f.folio) }}">
+                    <button type="button" class="btn-accion btn-editar">✏️ Editar</button>
+                </a>
+
+                <form method="POST" action="{{ url_for('eliminar_folio') }}"
+                      onsubmit="return confirm('¿Eliminar folio {{ f.folio }}? Esto no se puede deshacer.')">
+                    <input type="hidden" name="folio" value="{{ f.folio }}">
+                    <button type="submit" class="btn-accion btn-eliminar">🗑️</button>
+                </form>
+            </div>
+        </td>
+    </tr>
+    {% else %}
+    <tr>
+        <td colspan="10" style="text-align:center; color:#999; padding:20px;">
+            Sin folios con los filtros aplicados.
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
 </div>
 
-<footer>
-    <img src="{{ url_for('static', filename='footer.png') }}" alt="Footer">
-</footer>
-
-<script>
-// Columnas que se buscan (índices 0-7: folio,marca,linea,anio,serie,motor,color,nombre)
-const COLS_BUSQUEDA = [0, 1, 2, 3, 4, 5, 6, 7];
-
-function filtrar() {
-    const query   = document.getElementById('buscador').value.trim().toUpperCase();
-    const filas   = document.querySelectorAll('#cuerpo-tabla tr');
-    let visibles  = 0;
-
-    filas.forEach(fila => {
-        const celdas = fila.querySelectorAll('td');
-        let coincide = false;
-
-        if (query === '') {
-            coincide = true;
-        } else {
-            COLS_BUSQUEDA.forEach(idx => {
-                if (celdas[idx] && celdas[idx].textContent.toUpperCase().includes(query)) {
-                    coincide = true;
-                }
-            });
-        }
-
-        if (coincide) {
-            fila.classList.remove('oculta');
-            visibles++;
-
-            // Resaltar coincidencias en celdas buscables
-            COLS_BUSQUEDA.forEach(idx => {
-                if (!celdas[idx]) return;
-                const texto   = celdas[idx].textContent;
-                if (query && texto.toUpperCase().includes(query)) {
-                    const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi');
-                    celdas[idx].innerHTML = texto.replace(regex, '<mark>$1</mark>');
-                } else {
-                    celdas[idx].textContent = texto.replace(/<[^>]*>/g, '');
-                }
-            });
-
-        } else {
-            fila.classList.add('oculta');
-            // Limpiar resaltado en filas ocultas
-            COLS_BUSQUEDA.forEach(idx => {
-                if (celdas[idx]) celdas[idx].textContent = celdas[idx].textContent;
-            });
-        }
-    });
-
-    // Contador
-    const total = filas.length;
-    const cont  = document.getElementById('contador');
-    if (query === '') {
-        cont.textContent = `Total: ${total} folios`;
-    } else {
-        cont.textContent = `${visibles} coincidencia${visibles !== 1 ? 's' : ''} de ${total}`;
-    }
-}
-
-// Mostrar total al cargar
-filtrar();
-</script>
+<div class="back-link">
+    <a href="{{ url_for('admin') }}">← Volver al panel</a>
+</div>
 
 </body>
 </html>
