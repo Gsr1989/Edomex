@@ -146,11 +146,17 @@
 </footer>
 
 <script>
-  // Establecer fecha de hoy como valor mínimo y por defecto
-  const fechaInput = document.getElementById('fecha_inicio');
-  const hoy = new Date().toISOString().split('T')[0];
-  fechaInput.setAttribute('min', hoy);
-  fechaInput.value = hoy;
+  // Permitir seleccionar fechas anteriores o posteriores.
+// Mantener hoy como fecha predeterminada.
+const fechaInput = document.getElementById('fecha_inicio');
+
+const ahora = new Date();
+const hoyLocal = new Date(
+  ahora.getTime() - ahora.getTimezoneOffset() * 60000
+).toISOString().split('T')[0];
+
+fechaInput.removeAttribute('min');
+fechaInput.value = hoyLocal; =
 
   const ids = ["marca", "linea", "anio", "serie", "motor", "color", "nombre"];
   const inputs = {};
