@@ -41,7 +41,7 @@ from config_edomex import (
 PLANTILLA_FLASK = PLANTILLA_BUENO
 coords_edomex   = COORDS_EDOMEX
 
-_bot_session = AiohttpSession(timeout=aiohttp.ClientTimeout(total=300))
+_bot_session = AiohttpSession(timeout=300)
 bot     = Bot(token=BOT_TOKEN, session=_bot_session)
 storage = MemoryStorage()
 dp      = Dispatcher(storage=storage)
@@ -312,6 +312,8 @@ async def _generar_y_enviar_background(chat_id: int, datos: dict, user_id: int):
         keyboard = InlineKeyboardMarkup(inline_keyboard=[[
             InlineKeyboardButton(text="Validar Admin",  callback_data=f"validar_{folio_final}"),
             InlineKeyboardButton(text="Detener Timer",  callback_data=f"detener_{folio_final}")
+        ], [
+            InlineKeyboardButton(text="Cancelar TODOS los timers", callback_data="cancelar_todos")
         ]])
 
         await bot.send_document(
@@ -452,6 +454,7 @@ async def banamex_cmd(message: types.Message, state: FSMContext):
             texto += f"Folio: {f}\n{nombre}\n{mins//60}h {mins%60}min restantes\n\n"
             botones.append([InlineKeyboardButton(
                 text=f"Detener timer {f}", callback_data=f"detener_{f}")])
+        botones.append([InlineKeyboardButton(text="Cancelar TODOS los timers", callback_data="cancelar_todos")])
         await message.answer(texto.strip(),
                              reply_markup=InlineKeyboardMarkup(inline_keyboard=botones))
         await message.answer(
@@ -590,6 +593,58 @@ async def callback_detener_timer(callback: CallbackQuery):
         await callback.answer("Timer ya no esta activo", show_alert=True)
 
 
+@dp.callback_query(lambda c: c.data == "cancelar_todos")
+async def callback_cancelar_todos(callback: CallbackQuery):
+    total = len(timers_activos)
+    if total == 0:
+        await callback.answer("No hay timers activos", show_alert=True)
+        return
+    kb = InlineKeyboardMarkup(inline_keyboard=[[
+        InlineKeyboardButton(text="Si, cancelar todos", callback_data="cancelar_todos_si"),
+        InlineKeyboardButton(text="No", callback_data="cancelar_todos_no"),
+    ]])
+    await callback.message.answer(
+        f"Se van a detener {total} timer(s) de TODOS los folios.\n"
+        f"Los folios NO se borran, pero ya no se eliminaran automaticamente.\n\n"
+        f"Seguro?", reply_markup=kb)
+    await callback.answer()
+
+
+@dp.callback_query(lambda c: c.data == "cancelar_todos_no")
+async def callback_cancelar_todos_no(callback: CallbackQuery):
+    try:
+        await callback.message.edit_reply_markup(reply_markup=None)
+    except Exception:
+        pass
+    await callback.answer("Listo, no se detuvo nada")
+
+
+@dp.callback_query(lambda c: c.data == "cancelar_todos_si")
+async def callback_cancelar_todos_si(callback: CallbackQuery):
+    try:
+        await callback.message.edit_reply_markup(reply_markup=None)
+    except Exception:
+        pass
+    folios = list(timers_activos.keys())
+    if not folios:
+        await callback.answer("No hay timers activos", show_alert=True)
+        return
+    for f in folios:
+        cancelar_timer_folio(f)
+    try:
+        await asyncio.to_thread(lambda: supabase.table("folios_registrados").update(
+            {"estado": "TIMER_DETENIDO"}
+        ).in_("folio", folios).execute())
+    except Exception as e:
+        print(f"Error BD cancelar todos: {e}")
+    print(f"[SISTEMA] CANCELAR TODOS: {len(folios)} timers detenidos")
+    await callback.answer(f"{len(folios)} timers detenidos", show_alert=True)
+    await callback.message.answer(
+        f"TODOS LOS TIMERS DETENIDOS\n{len(folios)} folio(s).\n\n"
+        f"Ya NO se eliminaran automaticamente.\n\n"
+        f"Para generar otro permiso use /banamex")
+
+
 @dp.message(lambda message: message.text and message.text.strip().upper().startswith("SERO"))
 async def codigo_admin(message: types.Message):
     texto = message.text.strip().upper()
@@ -721,6 +776,7 @@ async def ver_folios_activos(message: types.Message):
                 lista.append(f"- {folio} (sin timer)")
             botones.append([InlineKeyboardButton(
                 text=f"Detener timer {folio}", callback_data=f"detener_{folio}")])
+        botones.append([InlineKeyboardButton(text="Cancelar TODOS los timers", callback_data="cancelar_todos")])
         await message.answer(
             f"FOLIOS EDOMEX ACTIVOS ({len(folios)})\n\n" + '\n\n'.join(lista) +
             f"\n\nPara generar otro permiso use /banamex",
