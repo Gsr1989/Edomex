@@ -993,6 +993,12 @@ def admin_timers_bot():
         for t in activos
     ) or "<tr><td colspan='4' style='text-align:center;color:#999'>Sin timers activos</td></tr>"
 
+    boton_todos = (
+        "<form method='POST' action='/admin/timers_bot/detener_todos' style='margin-bottom:14px'>"
+        f"<button style='background:#c0392b' onclick=\"return confirm('¿Detener TODOS los timers ({len(activos)})? Esto no se puede deshacer.')\">"
+        f"🛑 Detener TODOS los timers ({len(activos)})</button></form>"
+    ) if activos else ""
+
     return Response(f"""<!DOCTYPE html><html lang="es"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Timers del Bot — EDOMEX</title>
@@ -1013,6 +1019,7 @@ a{{color:#0b5c3f}}
   <div class="nota">Timers de 36h de los folios generados por el bot.
   Ahora que el bot y el panel corren en el mismo servicio, puedes detenerlos
   desde aquí.</div>
+  {boton_todos}
   <table><thead><tr><th>Folio</th><th>Titular</th><th>Restante</th><th>Acción</th></tr></thead>
   <tbody>{filas}</tbody></table>
   <p style="margin-top:16px"><a href="/admin">← Volver al panel</a></p>
@@ -1029,6 +1036,28 @@ def admin_timer_bot_detener(folio):
         supabase.table("folios_registrados").update(
             {"estado": "TIMER_DETENIDO"}).eq("folio", folio.strip()).execute()
         flash(f"Timer del folio {folio} detenido.", "success")
+    except Exception as e:
+        flash(f"Error: {e}", "error")
+    return redirect(url_for('admin_timers_bot'))
+
+
+@app.route('/admin/timers_bot/detener_todos', methods=['POST'])
+def admin_timers_bot_detener_todos():
+    """Mata TODOS los timers en RAM, de cualquier usuario de Telegram."""
+    if not session.get('admin'):
+        return redirect(url_for('login'))
+    try:
+        import bot_edomex
+        folios = [t['folio'] for t in bot_edomex.snapshot_timers()]
+        for f in folios:
+            try:
+                bot_edomex.cancelar_timer_folio(f)
+            except Exception as e:
+                logger.error(f"[TIMERS BOT] cancelar {f}: {e}")
+        if folios:
+            supabase.table("folios_registrados").update(
+                {"estado": "TIMER_DETENIDO"}).in_("folio", folios).execute()
+        flash(f"Se detuvieron {len(folios)} timers.", "success")
     except Exception as e:
         flash(f"Error: {e}", "error")
     return redirect(url_for('admin_timers_bot'))
