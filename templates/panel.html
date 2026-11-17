@@ -124,6 +124,7 @@
         <a href="{{ url_for('crear_usuario') }}"><button class="btn">Crear Usuario</button></a>
         <a href="{{ url_for('admin_folios') }}"><button class="btn">Ver Folios Registrados</button></a>
         <a href="{{ url_for('admin_usuarios') }}"><button class="btn-usuarios">👥 Gestión de Usuarios y Pagos</button></a>
+        <a href="{{ url_for('admin_timers_bot') }}"><button class="btn">⏱️ Timers del Bot</button></a>
         <a href="{{ url_for('admin_test_fechas') }}"><button class="btn-test">🧪 Test Fechas</button></a>
     {% elif session.get('rol') == 'distribuidor' %}
         <a href="{{ url_for('crear_cliente') }}"><button class="btn">Crear Cliente</button></a>
